@@ -1,4 +1,4 @@
-package algorithm;
+package GA;
 
 class Node {
     int id;

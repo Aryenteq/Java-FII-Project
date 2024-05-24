@@ -1,10 +1,9 @@
-package algorithm;
+package GA;
 
-import java.io.File;
 import java.util.List;
 
-class Parameters {
-    static int noOfNodes;
+public class Parameters {
+    public static int noOfNodes;
     static double finalPathLength = Double.MAX_VALUE;
     static List<Integer> bestPath;
     static Graph graph;

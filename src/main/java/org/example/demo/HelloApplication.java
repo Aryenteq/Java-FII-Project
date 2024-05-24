@@ -1,6 +1,6 @@
 package org.example.demo;
 
-import algorithm.VehicleRouting;
+import GA.VehicleRouting;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

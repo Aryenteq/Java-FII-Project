@@ -1,10 +1,9 @@
-package algorithm;
+package GA;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
 
+import static SA.SimulatedAnnealing.SA;
 
 public class VehicleRouting {
 
@@ -13,59 +12,12 @@ public class VehicleRouting {
         GA();
     }
 
-    public static void SA(List<Candidate> population) {
-        for (Candidate it : population) {
-            System.out.print("old: ");
-            it.printConverted();
-
-            double bestPath, t = 1, temperature = 100;
-            int index = 0;
-            do {
-                int contor = 0;
-                boolean contor2 = false;
-                do {
-                    Candidate bestNeighbour = it;
-                    bestPath = Double.MAX_VALUE;
-
-                    // Get the best neighbour
-                    for (int i = 0; i < Parameters.noOfNodes - 1; i++) {
-                        // Mutate (get a neighbour)
-                        it.changeChromosome(i, 1);
-                        it.calculateFitness();
-                        if (it.getFitness() < bestPath)
-                            bestPath = it.getFitness();
-                        index = i;
-
-                        // Reset
-                        it.changeChromosome(i, -1);
-                    }
-                    // Reset fitness
-                    it.calculateFitness();
-                    bestNeighbour.changeChromosome(index, 1);
-                    bestNeighbour.calculateFitness();
-
-                    // We've found a better neighbour
-                    if (bestNeighbour.getFitness() < it.getFitness())
-                        it = bestNeighbour;
-                    else if ((new Random().nextInt(1000) % 1000) / 1000.0 < Math.exp(-Math.abs(it.getFitness() - bestNeighbour.getFitness()) / temperature))
-                        it = bestNeighbour;
-                    else
-                        contor++;
-                } while (contor < 3 && !contor2);
-                System.out.println(temperature);
-                temperature *= 0.95;
-            } while (temperature > 10e-5);
-
-            System.out.print("new: ");
-            it.printConverted();
-        }
-    }
     static Graph readFile() {
         Graph graph = new Graph();
-        String filePath = "/Routes/" + Parameters.fileName;
+        String filePath = STR."/Routes/\{Parameters.fileName}";
         try (InputStream inputStream = VehicleRouting.class.getResourceAsStream(filePath)) {
             if (inputStream == null) {
-                throw new IllegalArgumentException("File not found: " + filePath);
+                throw new IllegalArgumentException(STR."File not found: \{filePath}");
             }
             try (Scanner file = new Scanner(inputStream)) {
                 while (file.hasNextLine()) {
@@ -88,7 +40,7 @@ public class VehicleRouting {
                 for (int i = 0; i < graph.nodesNumber; i++) {
                     String[] tokens = file.nextLine().trim().split("\\s+");
                     if (tokens.length != 3) {
-                        throw new IllegalArgumentException("Invalid node data format: " + Arrays.toString(tokens));
+                        throw new IllegalArgumentException(STR."Invalid node data format: \{Arrays.toString(tokens)}");
                     }
                     graph.nodeArr.add(new Node(i,
                             Integer.parseInt(tokens[0]),
@@ -169,7 +121,7 @@ public class VehicleRouting {
             if (Parameters.finalPathLength == oldFinalPathLength) {
                 noChange++;
             } else {
-                //SA(population); -- ?? doesn't work, algorithm gets stuck here
+                // SA(population); // -- ?? doesn't work, algorithm gets stuck here
                 noChange = 0;
             }
 
@@ -182,9 +134,9 @@ public class VehicleRouting {
                 }
                 noChange = 0;
             }
-            System.out.print(Parameters.finalPathLength + " ");
+            System.out.print(STR."\{Parameters.finalPathLength} ");
             showBestPath();
-            System.out.println("Generation " + i + " of " + Parameters.generations);
+            System.out.println(STR."Generation \{i} of \{Parameters.generations}");
         }
 
         // Ensure program exits correctly
@@ -239,7 +191,7 @@ public class VehicleRouting {
 
     static void showBestPath() {
         for (int i = 0; i < Parameters.noOfNodes; i++) {
-            System.out.print(Parameters.bestPath.get(i) + " ");
+            System.out.print(STR."\{Parameters.bestPath.get(i)} ");
         }
         System.out.println();
     }
