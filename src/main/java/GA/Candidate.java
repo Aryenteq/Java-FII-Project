@@ -6,6 +6,12 @@ import java.util.List;
 import java.util.Random;
 import Data.Graph;
 
+/* Keep in mind that 0 is the first node, always
+    Therefore, some restrictions appear in the code
+    Such as indexes starting from 1 (I know, horrible)
+    And injecting the node 0 in the chromosome
+    */
+
 public class Candidate implements Comparable<Candidate> {
     double pathLength;
     List<Integer> chromosome;
@@ -13,16 +19,20 @@ public class Candidate implements Comparable<Candidate> {
 
     public Candidate(List<Integer> order) {
         this.chromosome = new ArrayList<>(order);
+        if (chromosome.get(0) != 0) {
+            throw new IllegalArgumentException("First node is not 0 - good luck");
+        }
         calculateFitness();
     }
 
     public Candidate() {
         chromosome = new ArrayList<>();
         List<Integer> nodes = new ArrayList<>();
-        for (int i = 0; i < Graph.nodesNumber; i++) {
+        for (int i = 1; i < Graph.nodesNumber; i++) {
             nodes.add(i);
         }
         Collections.shuffle(nodes);
+        chromosome.add(0);
         chromosome.addAll(nodes);
         calculateFitness();
     }
@@ -30,9 +40,14 @@ public class Candidate implements Comparable<Candidate> {
     public void calculateFitness() {
         double result = 0;
         for (int i = 0; i < Graph.nodesNumber - 1; i++) {
-            result += Graph.distances.get(chromosome.get(i)).get(chromosome.get(i + 1));
+            if(i != 0 && i % Parameters.nodesPerVehicle == 0) {
+                result += Graph.distances.get(chromosome.get(i)).getFirst();
+                result += Graph.distances.getFirst().get(chromosome.get(i + 1));
+            } else {
+                result += Graph.distances.get(chromosome.get(i)).get(chromosome.get(i + 1));
+            }
         }
-        result += Graph.distances.get(chromosome.get(Graph.nodesNumber - 1)).get(chromosome.get(0));
+        result += Graph.distances.get(chromosome.get(Graph.nodesNumber - 1)).get(chromosome.getFirst());
         this.pathLength = result;
 
         if (result < Parameters.finalPathLength) {
@@ -49,9 +64,9 @@ public class Candidate implements Comparable<Candidate> {
 
     public void mutate(double prob) {
         Random rand = new Random();
-        for (int i = 0; i < chromosome.size(); i++) {
+        for (int i = 1; i < chromosome.size(); i++) {
             if (rand.nextDouble() <= prob) {
-                int j = rand.nextInt(chromosome.size());
+                int j = rand.nextInt(chromosome.size() - 1) + 1;
                 Collections.swap(chromosome, i, j);
             }
         }
@@ -63,37 +78,14 @@ public class Candidate implements Comparable<Candidate> {
         return Double.compare(this.fitness, other.fitness);
     }
 
-    // Order Crossover (OX)
-    public static Candidate crossoverOX(Candidate p1, Candidate p2) {
-        Random rand = new Random();
-        int start = rand.nextInt(Graph.nodesNumber);
-        int end = rand.nextInt(Graph.nodesNumber - start) + start;
-
-        List<Integer> childChromosome = new ArrayList<>(Collections.nCopies(Graph.nodesNumber, -1));
-        for (int i = start; i <= end; i++) {
-            childChromosome.set(i, p1.chromosome.get(i));
-        }
-
-        int currentIndex = (end + 1) % Graph.nodesNumber;
-        for (int i = 0; i < Graph.nodesNumber; i++) {
-            int index = (end + 1 + i) % Graph.nodesNumber;
-            int gene = p2.chromosome.get(index);
-            if (!childChromosome.contains(gene)) {
-                childChromosome.set(currentIndex, gene);
-                currentIndex = (currentIndex + 1) % Graph.nodesNumber;
-            }
-        }
-
-        return new Candidate(childChromosome);
-    }
-
     // Partially Mapped Crossover (PMX)
     public static Candidate crossoverPMX(Candidate p1, Candidate p2) {
         Random rand = new Random();
-        int start = rand.nextInt(Graph.nodesNumber);
+        int start = rand.nextInt(Graph.nodesNumber - 1) + 1;
         int end = rand.nextInt(Graph.nodesNumber - start) + start;
 
         List<Integer> childChromosome = new ArrayList<>(Collections.nCopies(Graph.nodesNumber, -1));
+        childChromosome.set(0, 0);
         for (int i = start; i <= end; i++) {
             childChromosome.set(i, p1.chromosome.get(i));
         }
@@ -109,7 +101,7 @@ public class Candidate implements Comparable<Candidate> {
             }
         }
 
-        for (int i = 0; i < Graph.nodesNumber; i++) {
+        for (int i = 1; i < Graph.nodesNumber; i++) {
             if (childChromosome.get(i) == -1) {
                 childChromosome.set(i, p2.chromosome.get(i));
             }
@@ -134,6 +126,7 @@ public class Candidate implements Comparable<Candidate> {
         chromosome.set(index, newValue);
     }
 
+    /* Magic */
     public void localSearch() {
         boolean improvement = true;
         while (improvement) {
@@ -166,6 +159,35 @@ public class Candidate implements Comparable<Candidate> {
             i++;
             j--;
         }
+    }
+
+
+
+
+
+    // Order Crossover (OX) - not used, PMX is better
+    public static Candidate crossoverOX(Candidate p1, Candidate p2) {
+        Random rand = new Random();
+        int start = rand.nextInt(Graph.nodesNumber - 1) + 1;
+        int end = rand.nextInt(Graph.nodesNumber - start) + start;
+
+        List<Integer> childChromosome = new ArrayList<>(Collections.nCopies(Graph.nodesNumber, -1));
+        childChromosome.set(0, 0);
+        for (int i = start; i <= end; i++) {
+            childChromosome.set(i, p1.chromosome.get(i));
+        }
+
+        int currentIndex = (end + 1) % Graph.nodesNumber;
+        for (int i = 1; i < Graph.nodesNumber; i++) {
+            int index = (end + 1 + i) % Graph.nodesNumber;
+            int gene = p2.chromosome.get(index);
+            if (!childChromosome.contains(gene)) {
+                childChromosome.set(currentIndex, gene);
+                currentIndex = (currentIndex + 1) % Graph.nodesNumber;
+            }
+        }
+
+        return new Candidate(childChromosome);
     }
 
 }

@@ -3,12 +3,11 @@ package GA;
 import java.util.List;
 
 public class Parameters {
-    public static int noOfVehicles;
     public static int nodesPerVehicle = 10;
     static double finalPathLength = Double.MAX_VALUE;
     static List<Integer> bestPath;
     static int populationSize = 500;
-    static int generations = 800;
+    static int generations = 1000;
     static double mutationProbability = 0.001;
     static double hypermutationProbability = 0.1;
     static double crossoverProbability = 0.8;
@@ -24,5 +23,5 @@ public class Parameters {
     static boolean Hypermutation = true;
 
     public static String fileName = "berlin52.tsp";
-    //static String fileName = "rat783.tsp";
+    // public static String fileName = "rat783.tsp";
 }

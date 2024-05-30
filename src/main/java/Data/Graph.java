@@ -42,12 +42,14 @@ public class Graph {
                     if (tokens.length != 3) {
                         throw new IllegalArgumentException("Invalid node data format: " + Arrays.toString(tokens));
                     }
+                    assert nodeArr != null;
                     nodeArr.add(new Node(i,
                             Float.parseFloat(tokens[1]),
                             Float.parseFloat(tokens[2])
                     ));
                 }
 
+                assert edgeWeightType != null;
                 if (edgeWeightType.equals("EUC_2D")) {
                     for (int i = 0; i < nodesNumber; i++) {
                         for (int j = 0; j < nodesNumber; j++) {
