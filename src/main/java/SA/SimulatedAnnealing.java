@@ -1,5 +1,6 @@
 package SA;
 
+import Data.Graph;
 import GA.Candidate;
 import GA.Parameters;
 
@@ -22,7 +23,7 @@ public class SimulatedAnnealing {
                     bestPath = Double.MAX_VALUE;
 
                     // Get the best neighbour
-                    for (int i = 0; i < Parameters.noOfNodes - 1; i++) {
+                    for (int i = 0; i < Graph.nodesNumber - 1; i++) {
                         // Mutate (get a neighbour)
                         it.changeChromosome(i, 1);
                         it.calculateFitness();
