@@ -3,21 +3,20 @@ package GA;
 import java.io.InputStream;
 import java.util.*;
 
-import static SA.SimulatedAnnealing.SA;
-
 public class VehicleRouting {
 
     public static void run() {
         Parameters.graph = readFile();
+        printDistances(Parameters.graph);
         GA();
     }
 
     static Graph readFile() {
         Graph graph = new Graph();
-        String filePath = STR."/Routes/\{Parameters.fileName}";
+        String filePath = "/Routes/" + Parameters.fileName;
         try (InputStream inputStream = VehicleRouting.class.getResourceAsStream(filePath)) {
             if (inputStream == null) {
-                throw new IllegalArgumentException(STR."File not found: \{filePath}");
+                throw new IllegalArgumentException("File not found: " + filePath);
             }
             try (Scanner file = new Scanner(inputStream)) {
                 while (file.hasNextLine()) {
@@ -40,10 +39,9 @@ public class VehicleRouting {
                 for (int i = 0; i < graph.nodesNumber; i++) {
                     String[] tokens = file.nextLine().trim().split("\\s+");
                     if (tokens.length != 3) {
-                        throw new IllegalArgumentException(STR."Invalid node data format: \{Arrays.toString(tokens)}");
+                        throw new IllegalArgumentException("Invalid node data format: " + Arrays.toString(tokens));
                     }
                     graph.nodeArr.add(new Node(i,
-                            Integer.parseInt(tokens[0]),
                             Float.parseFloat(tokens[1]),
                             Float.parseFloat(tokens[2])
                     ));
@@ -55,8 +53,9 @@ public class VehicleRouting {
                             if (i != j) {
                                 Node n1 = graph.nodeArr.get(i);
                                 Node n2 = graph.nodeArr.get(j);
+
                                 double distance = Math.sqrt(Math.pow(n1.x - n2.x, 2) + Math.pow(n1.y - n2.y, 2));
-                                graph.distances.get(i).set(j, (double) Math.round(distance));
+                                graph.distances.get(i).set(j, distance);
                             }
                         }
                     }
@@ -67,6 +66,16 @@ public class VehicleRouting {
         }
         Parameters.noOfNodes = graph.nodesNumber;
         return graph;
+    }
+
+    static void printDistances(Graph graph) {
+        System.out.println("Distance Matrix:");
+        for (int i = 0; i < graph.nodesNumber; i++) {
+            for (int j = 0; j < graph.nodesNumber; j++) {
+                System.out.print(graph.distances.get(i).get(j) + " ");
+            }
+            System.out.println();
+        }
     }
 
     static void GA() {
@@ -103,7 +112,7 @@ public class VehicleRouting {
                 double probability = Math.random();
                 if (probability < Parameters.crossoverProbability) {
                     if (j != Parameters.populationSize - 1) {
-                        population.set(j, Candidate.crossover(population.get(j), population.get(j + 1)));
+                        population.set(j, Candidate.crossoverPMX(population.get(j), population.get(j + 1)));
                     }
                 }
             }
@@ -134,9 +143,17 @@ public class VehicleRouting {
                 }
                 noChange = 0;
             }
-            System.out.print(STR."\{Parameters.finalPathLength} ");
+
+            // Wisdom of Crowds
+            if (noChange > Parameters.maxStagnationUntilWisdom) {
+                List<Integer> consensusPath = wisdomOfCrowds(population);
+                population.set(0, new Candidate(consensusPath));
+                noChange = 0;
+            }
+
+            System.out.print(Parameters.finalPathLength + " ");
             showBestPath();
-            System.out.println(STR."Generation \{i} of \{Parameters.generations}");
+            System.out.println("Generation " + i + " of " + Parameters.generations);
         }
 
         // Ensure program exits correctly
@@ -191,40 +208,28 @@ public class VehicleRouting {
 
     static void showBestPath() {
         for (int i = 0; i < Parameters.noOfNodes; i++) {
-            System.out.print(STR."\{Parameters.bestPath.get(i)} ");
+            System.out.print(Parameters.bestPath.get(i) + " ");
         }
         System.out.println();
     }
-}
 
-//    static void OptimizedPath() {
-//        try (Scanner file = new Scanner(Objects.requireNonNull(VehicleRouting.class.getResourceAsStream(STR."/Routes\{Parameters.fileName}")))) {
-//            boolean tourSectionFound = false;
-//            int lastNumber = -1;
-//            double confirmedBestPath = 0;
-//            while (file.hasNextLine()) {
-//                String line = file.nextLine();
-//                if (line.contains("TOUR_SECTION")) {
-//                    tourSectionFound = true;
-//                    continue;
-//                }
-//                if (tourSectionFound) {
-//                    String[] tokens = line.trim().split("\\s+");
-//                    for (String token : tokens) {
-//                        int number = Integer.parseInt(token);
-//                        if (lastNumber != -1) {
-//                            confirmedBestPath += Parameters.graph.distances.get(lastNumber - 1).get(number - 1);
-//                            lastNumber = number;
-//                        } else {
-//                            lastNumber = number;
-//                        }
-//                    }
-//                    if (tokens[tokens.length - 1].equals("-1"))
-//                        break;
-//                }
-//            }
-//            System.out.println("\nReal best path distance: " + confirmedBestPath);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    // Wisdom of Crowds
+    static List<Integer> wisdomOfCrowds(List<Candidate> population) {
+        Map<Integer, Integer> nodeFrequency = new HashMap<>();
+        for (Candidate candidate : population) {
+            for (Integer node : candidate.chromosome) {
+                nodeFrequency.put(node, nodeFrequency.getOrDefault(node, 0) + 1);
+            }
+        }
+
+        List<Map.Entry<Integer, Integer>> sortedNodes = new ArrayList<>(nodeFrequency.entrySet());
+        sortedNodes.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
+
+        List<Integer> consensusPath = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : sortedNodes) {
+            consensusPath.add(entry.getKey());
+        }
+
+        return consensusPath;
+    }
+}

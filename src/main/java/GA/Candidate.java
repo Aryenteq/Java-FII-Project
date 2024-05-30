@@ -1,6 +1,7 @@
 package GA;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -10,46 +11,32 @@ public class Candidate implements Comparable<Candidate> {
     double fitness;
 
     public Candidate(List<Integer> order) {
-        this.chromosome = order;
+        this.chromosome = new ArrayList<>(order);
         calculateFitness();
     }
 
     public Candidate() {
         chromosome = new ArrayList<>();
-
-        Random rand = new Random();
-        int index = 0;
-        for (int i = Parameters.noOfNodes-1; i>=0; i--) {
-            index = rand.nextInt(i+1);
-            chromosome.add(index);
+        List<Integer> nodes = new ArrayList<>();
+        for (int i = 0; i < Parameters.noOfNodes; i++) {
+            nodes.add(i);
         }
+        Collections.shuffle(nodes);
+        chromosome.addAll(nodes);
         calculateFitness();
     }
 
     public void calculateFitness() {
-        List<Integer> ordered = new ArrayList<>();
-        for (int i = 0; i < Parameters.noOfNodes; i++) {
-            ordered.add(i);
-        }
-
-        //List<Integer> converted = chromosome.stream().map(ordered::get).collect(Collectors.toList());
-        List<Integer> converted = new ArrayList<>(Parameters.noOfNodes);
-        for (int i = 0; i < Parameters.noOfNodes; i++) {
-            converted.add(ordered.get(chromosome.get(i)));
-            int index = ordered.indexOf(converted.get(i));
-            if (index != -1)
-                ordered.remove(index);
-        }
-
         double result = 0;
         for (int i = 0; i < Parameters.noOfNodes - 1; i++) {
-            result += Parameters.graph.distances.get(converted.get(i)).get(converted.get(i + 1));
+            result += Parameters.graph.distances.get(chromosome.get(i)).get(chromosome.get(i + 1));
         }
+        result += Parameters.graph.distances.get(chromosome.get(Parameters.noOfNodes - 1)).get(chromosome.get(0));
         this.pathLength = result;
 
         if (result < Parameters.finalPathLength) {
             Parameters.finalPathLength = result;
-            Parameters.bestPath = converted;
+            Parameters.bestPath = new ArrayList<>(chromosome);
         }
 
         this.fitness = 1 / result;
@@ -60,10 +47,11 @@ public class Candidate implements Comparable<Candidate> {
     }
 
     public void mutate(double prob) {
-        for (int i = 0; i < Parameters.noOfNodes - 1; i++) {
-            double probability = Math.random();
-            if (probability <= prob) {
-                //chromosome.set(i, (chromosome.get(i) + 1) % (Parameters.noOfNodes - i));
+        Random rand = new Random();
+        for (int i = 0; i < chromosome.size(); i++) {
+            if (rand.nextDouble() <= prob) {
+                int j = rand.nextInt(chromosome.size());
+                Collections.swap(chromosome, i, j);
             }
         }
         calculateFitness();
@@ -74,58 +62,74 @@ public class Candidate implements Comparable<Candidate> {
         return Double.compare(this.fitness, other.fitness);
     }
 
-    public static Candidate crossover(Candidate p1, Candidate p2) {
-        int index1 = (int) (Math.random() * (Parameters.noOfNodes - 2));
-        int index2 = (int) (Math.random() * (Parameters.noOfNodes - 2));
-        if (index2 < index1) {
-            int temp = index1;
-            index1 = index2;
-            index2 = temp;
+    // Order Crossover (OX)
+    public static Candidate crossoverOX(Candidate p1, Candidate p2) {
+        Random rand = new Random();
+        int start = rand.nextInt(Parameters.noOfNodes);
+        int end = rand.nextInt(Parameters.noOfNodes - start) + start;
+
+        List<Integer> childChromosome = new ArrayList<>(Collections.nCopies(Parameters.noOfNodes, -1));
+        for (int i = start; i <= end; i++) {
+            childChromosome.set(i, p1.chromosome.get(i));
         }
-        List<Integer> child = new ArrayList<>();
-        for (int i = 0; i <= index1; i++)
-            child.add(p1.chromosome.get(i));
-        for (int i = index1 + 1; i <= index2; i++)
-            child.add(p2.chromosome.get(i));
-        for (int i = index2 + 1; i < Parameters.noOfNodes; i++)
-            child.add(p1.chromosome.get(i));
-        return new Candidate(child);
+
+        int currentIndex = (end + 1) % Parameters.noOfNodes;
+        for (int i = 0; i < Parameters.noOfNodes; i++) {
+            int index = (end + 1 + i) % Parameters.noOfNodes;
+            int gene = p2.chromosome.get(index);
+            if (!childChromosome.contains(gene)) {
+                childChromosome.set(currentIndex, gene);
+                currentIndex = (currentIndex + 1) % Parameters.noOfNodes;
+            }
+        }
+
+        return new Candidate(childChromosome);
     }
 
+    // Partially Mapped Crossover (PMX)
+    public static Candidate crossoverPMX(Candidate p1, Candidate p2) {
+        Random rand = new Random();
+        int start = rand.nextInt(Parameters.noOfNodes);
+        int end = rand.nextInt(Parameters.noOfNodes - start) + start;
 
+        List<Integer> childChromosome = new ArrayList<>(Collections.nCopies(Parameters.noOfNodes, -1));
+        for (int i = start; i <= end; i++) {
+            childChromosome.set(i, p1.chromosome.get(i));
+        }
 
+        for (int i = start; i <= end; i++) {
+            int gene = p2.chromosome.get(i);
+            if (!childChromosome.contains(gene)) {
+                int position = i;
+                while (start <= position && position <= end) {
+                    position = p2.chromosome.indexOf(p1.chromosome.get(position));
+                }
+                childChromosome.set(position, gene);
+            }
+        }
 
-    // Methods for SA
+        for (int i = 0; i < Parameters.noOfNodes; i++) {
+            if (childChromosome.get(i) == -1) {
+                childChromosome.set(i, p2.chromosome.get(i));
+            }
+        }
+
+        return new Candidate(childChromosome);
+    }
+
+    // Print the converted chromosome
     public void printConverted() {
-        List<Integer> ordered = new ArrayList<>();
-        for (int i = 0; i < Parameters.noOfNodes; i++) {
-            ordered.add(i);
+        for (Integer gene : chromosome) {
+            System.out.print(gene + " ");
         }
-
-        //List<Integer> converted = chromosome.stream().map(ordered::get).collect(Collectors.toList());
-        List<Integer> converted = new ArrayList<>(Parameters.noOfNodes);
-        for (int i = 0; i < Parameters.noOfNodes; i++) {
-            converted.add(ordered.get(chromosome.get(i)));
-            int index = ordered.indexOf(converted.get(i));
-            if (index != -1)
-                ordered.remove(index);
-        }
-
-        for (int i = 0; i < Parameters.noOfNodes; i++)
-            System.out.print(STR."\{converted.get(i)} ");
         System.out.println();
     }
 
     public void changeChromosome(int index, int addedNumber) {
-        int moduloBase = Parameters.noOfNodes - index;
-
-        if (addedNumber >= 0)
-            this.chromosome.set(index, (this.chromosome.get(index) + addedNumber) % moduloBase);
-        else {
-            int adjustedNumber = (this.chromosome.get(index) + addedNumber) % moduloBase;
-            this.chromosome.set(index, (adjustedNumber + moduloBase) % moduloBase);
+        int newValue = (chromosome.get(index) + addedNumber) % Parameters.noOfNodes;
+        if (newValue < 0) {
+            newValue += Parameters.noOfNodes;
         }
+        chromosome.set(index, newValue);
     }
-
 }
-
