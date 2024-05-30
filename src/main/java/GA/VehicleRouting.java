@@ -132,6 +132,16 @@ public class VehicleRouting {
 
         for (int i = 0; i < Parameters.populationSize - 1 - helperToMaintainPopSize; i++) {
             double probability = random.nextDouble();
+//            int st = 0, dr = Parameters.populationSize - 1, mid = 0;
+//            while (st < dr) {
+//                mid = (st + dr) / 2;
+//                if(q.get(mid) < probability) {
+//                    st = mid + 1;
+//                } else {
+//                    dr = mid -1;
+//                }
+//            }
+//            newPopulation.add(population.get(mid));
             int selectedIndex = 0;
             for (int j = 0; j < q.size() - 1; j++) {
                 if (probability >= q.get(j) && probability < q.get(j + 1)) {

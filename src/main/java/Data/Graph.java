@@ -2,7 +2,6 @@ package Data;
 
 import GA.Parameters;
 import GA.VehicleRouting;
-import com.almasb.fxgl.core.collection.Array;
 
 import java.io.InputStream;
 import java.util.*;
@@ -10,9 +9,9 @@ import java.util.*;
 public class Graph {
     public static int nodesNumber;
     public static List<List<Double>> distances;
-    String name;
-    List<Node> nodeArr;
-    String edgeWeightType;
+    private String name;
+    private List<Node> nodeArr;
+    private String edgeWeightType;
 
     public Graph() {
         String filePath = "/Routes/" + Parameters.fileName;
