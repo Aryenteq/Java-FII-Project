@@ -11,10 +11,10 @@ public class Parameters {
     static Graph graph;
     static int populationSize = 2000;
     static int generations = 2000;
-    static double mutationProbability = 0.005;
+    static double mutationProbability = 0.002;
     static double hypermutationProbability = 0.1;
     static int maxStagnationUntilHypermutation = 50;
-    static double crossoverProbability = 0.98;
+    static double crossoverProbability = 0.8;
     static double selectionPressureAdjustment = 0.2;
     static int elitism = 4;
     static int maxStagnationUntilSA = 100;
