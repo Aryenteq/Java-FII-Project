@@ -110,14 +110,6 @@ public class Candidate implements Comparable<Candidate> {
         return new Candidate(childChromosome);
     }
 
-    // Print the converted chromosome
-    public void printConverted() {
-        for (Integer gene : chromosome) {
-            System.out.print(gene + " ");
-        }
-        System.out.println();
-    }
-
     public void changeChromosome(int index, int addedNumber) {
         int newValue = (chromosome.get(index) + addedNumber) % Graph.nodesNumber;
         if (newValue < 0) {

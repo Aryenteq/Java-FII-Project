@@ -25,7 +25,6 @@ public class Parameters {
     public static String fileName = "berlin52.tsp";
     // public static String fileName = "rat783.tsp";
 
-
     public static void setNodesPerVehicle(int nodesPerVehicle) {
         Parameters.nodesPerVehicle = nodesPerVehicle;
     }

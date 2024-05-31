@@ -10,9 +10,6 @@ import java.util.Random;
 public class SimulatedAnnealing {
     public static void SA(List<Candidate> population) {
         for (Candidate it : population) {
-            System.out.print("old: ");
-            it.printConverted();
-
             double bestPath, t = 1, temperature = 100;
             int index = 0;
             do {
@@ -50,9 +47,6 @@ public class SimulatedAnnealing {
                 System.out.println(temperature);
                 temperature *= 0.95;
             } while (temperature > 10e-5);
-
-            System.out.print("new: ");
-            it.printConverted();
         }
     }
 }
