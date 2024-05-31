@@ -54,7 +54,7 @@ public class VehicleRouting {
             for (int j = 0; j < Parameters.populationSize - 1; j += 2) {
                 double probability = Math.random();
                 if (probability < Parameters.crossoverProbability) {
-                    if (j != Parameters.populationSize - 1) {
+                    if (j < Parameters.populationSize - 1) {
                         population.set(j, Candidate.crossoverPMX(population.get(j), population.get(j + 1), graph));
                     }
                 }
@@ -102,12 +102,10 @@ public class VehicleRouting {
     private void selection(List<Candidate> population) {
         List<Candidate> newPopulation = new ArrayList<>();
 
-        if (Parameters.Elitism) {
-            population.sort(Comparator.reverseOrder());
-            for (int i = Parameters.populationSize - 1; i >= Parameters.populationSize - 1 - Parameters.elitism; i--) {
-                newPopulation.add(population.get(i));
-                population.remove(i);
-            }
+        population.sort(Comparator.reverseOrder());
+        for (int i = Parameters.populationSize - 1; i >= Parameters.populationSize - 1 - Parameters.elitism; i--) {
+            newPopulation.add(population.get(i));
+            population.remove(i);
         }
 
         double fitnessSum = population.stream().mapToDouble(Candidate::getFitness).sum();
@@ -121,10 +119,7 @@ public class VehicleRouting {
             q.add(q.get(i) + prob.get(i));
         }
 
-        int helperToMaintainPopSize = 0;
-        if (Parameters.Elitism) {
-            helperToMaintainPopSize = Parameters.elitism;
-        }
+        int helperToMaintainPopSize = Parameters.elitism;
 
         Random random = new Random();
 
