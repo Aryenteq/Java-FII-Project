@@ -111,6 +111,12 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.graph4j</groupId>
+            <artifactId>graph4j</artifactId>
+            <version>1.0.7</version>
+        </dependency>
     </dependencies>
 
     <build>

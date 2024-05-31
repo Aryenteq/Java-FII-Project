@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import Data.Graph;
+
+import Data.CustomGraph;
 
 /* Keep in mind that 0 is the first node, always
     Therefore, some restrictions appear in the code
@@ -16,19 +17,22 @@ public class Candidate implements Comparable<Candidate> {
     double pathLength;
     List<Integer> chromosome;
     double fitness;
+    CustomGraph graph;
 
-    public Candidate(List<Integer> order) {
+    public Candidate(List<Integer> order, CustomGraph graph) {
+        this.graph = graph;
         this.chromosome = new ArrayList<>(order);
-        if (chromosome.get(0) != 0) {
+        if (chromosome.getFirst() != 0) {
             throw new IllegalArgumentException("First node is not 0 - good luck");
         }
         calculateFitness();
     }
 
-    public Candidate() {
+    public Candidate(CustomGraph graph) {
+        this.graph = graph;
         chromosome = new ArrayList<>();
         List<Integer> nodes = new ArrayList<>();
-        for (int i = 1; i < Graph.nodesNumber; i++) {
+        for (int i = 1; i < graph.getNodesNumber(); i++) {
             nodes.add(i);
         }
         Collections.shuffle(nodes);
@@ -39,15 +43,30 @@ public class Candidate implements Comparable<Candidate> {
 
     public void calculateFitness() {
         double result = 0;
-        for (int i = 0; i < Graph.nodesNumber - 1; i++) {
-            if(i != 0 && i % Parameters.nodesPerVehicle == 0) {
-                result += Graph.distances.get(chromosome.get(i)).getFirst();
-                result += Graph.distances.getFirst().get(chromosome.get(i + 1));
-            } else {
-                result += Graph.distances.get(chromosome.get(i)).get(chromosome.get(i + 1));
+
+        // Get the distances based on the type of data structure used (custom graph || graph4j)
+        if (!Parameters.useGraph4j) {
+            for (int i = 0; i < graph.getNodesNumber() - 1; i++) {
+                if (i != 0 && i % Parameters.nodesPerVehicle == 0) {
+                    result += graph.getDistances().get(chromosome.get(i)).getFirst();
+                    result += graph.getDistances().getFirst().get(chromosome.get(i + 1));
+                } else {
+                    result += graph.getDistances().get(chromosome.get(i)).get(chromosome.get(i + 1));
+                }
             }
+            result += graph.getDistances().get(chromosome.get(graph.getNodesNumber() - 1)).getFirst();
+        } else {
+            for (int i = 0; i < graph.getNodesNumber() - 1; i++) {
+                if (i != 0 && i % Parameters.nodesPerVehicle == 0) {
+                    result += graph.getGraph().getEdgeWeight(chromosome.get(i), 0);
+                    result += graph.getGraph().getEdgeWeight(0, chromosome.get(i + 1));
+                } else {
+                    result += graph.getGraph().getEdgeWeight(chromosome.get(i), chromosome.get(i + 1));
+                }
+            }
+            result += graph.getGraph().getEdgeWeight(chromosome.get(graph.getNodesNumber() - 1), 0);
         }
-        result += Graph.distances.get(chromosome.get(Graph.nodesNumber - 1)).get(chromosome.getFirst());
+
         this.pathLength = result;
 
         if (result < Parameters.finalPathLength) {
@@ -79,12 +98,12 @@ public class Candidate implements Comparable<Candidate> {
     }
 
     // Partially Mapped Crossover (PMX)
-    public static Candidate crossoverPMX(Candidate p1, Candidate p2) {
+    public static Candidate crossoverPMX(Candidate p1, Candidate p2, CustomGraph graph) {
         Random rand = new Random();
-        int start = rand.nextInt(Graph.nodesNumber - 1) + 1;
-        int end = rand.nextInt(Graph.nodesNumber - start) + start;
+        int start = rand.nextInt(graph.getNodesNumber() - 1) + 1;
+        int end = rand.nextInt(graph.getNodesNumber() - start) + start;
 
-        List<Integer> childChromosome = new ArrayList<>(Collections.nCopies(Graph.nodesNumber, -1));
+        List<Integer> childChromosome = new ArrayList<>(Collections.nCopies(graph.getNodesNumber(), -1));
         childChromosome.set(0, 0);
         for (int i = start; i <= end; i++) {
             childChromosome.set(i, p1.chromosome.get(i));
@@ -101,19 +120,19 @@ public class Candidate implements Comparable<Candidate> {
             }
         }
 
-        for (int i = 1; i < Graph.nodesNumber; i++) {
+        for (int i = 1; i < graph.getNodesNumber(); i++) {
             if (childChromosome.get(i) == -1) {
                 childChromosome.set(i, p2.chromosome.get(i));
             }
         }
 
-        return new Candidate(childChromosome);
+        return new Candidate(childChromosome, graph);
     }
 
     public void changeChromosome(int index, int addedNumber) {
-        int newValue = (chromosome.get(index) + addedNumber) % Graph.nodesNumber;
+        int newValue = (chromosome.get(index) + addedNumber) % graph.getNodesNumber();
         if (newValue < 0) {
-            newValue += Graph.nodesNumber;
+            newValue += graph.getNodesNumber();
         }
         chromosome.set(index, newValue);
     }
@@ -141,8 +160,44 @@ public class Candidate implements Comparable<Candidate> {
         int b = chromosome.get(i);
         int c = chromosome.get(j);
         int d = chromosome.get((j + 1) % chromosome.size());
-        return Graph.distances.get(a).get(c) + Graph.distances.get(b).get(d) -
-                (Graph.distances.get(a).get(b) + Graph.distances.get(c).get(d));
+
+        if (!Parameters.useGraph4j) {
+            // Use distances matrix
+            return graph.getDistances().get(a).get(c) + graph.getDistances().get(b).get(d) -
+                    (graph.getDistances().get(a).get(b) + graph.getDistances().get(c).get(d));
+        } else {
+            // Use Graph4J graph object
+            double distanceAC = 0;
+            double distanceBD = 0;
+            double distanceAB = 0;
+            double distanceCD = 0;
+
+            for (var it = graph.getGraph().neighborIterator(a); it.hasNext(); ) {
+                int neighbor = it.next();
+                if (neighbor == c) {
+                    distanceAC = it.getEdgeWeight();
+                }
+                if (neighbor == b) {
+                    distanceAB = it.getEdgeWeight();
+                }
+            }
+
+            for (var it = graph.getGraph().neighborIterator(b); it.hasNext(); ) {
+                int neighbor = it.next();
+                if (neighbor == d) {
+                    distanceBD = it.getEdgeWeight();
+                }
+            }
+
+            for (var it = graph.getGraph().neighborIterator(c); it.hasNext(); ) {
+                int neighbor = it.next();
+                if (neighbor == d) {
+                    distanceCD = it.getEdgeWeight();
+                }
+            }
+
+            return distanceAC + distanceBD - (distanceAB + distanceCD);
+        }
     }
 
     private void apply2OptSwap(int i, int j) {
@@ -158,28 +213,28 @@ public class Candidate implements Comparable<Candidate> {
 
 
     // Order Crossover (OX) - not used, PMX is better
-    public static Candidate crossoverOX(Candidate p1, Candidate p2) {
+    public Candidate crossoverOX(Candidate p1, Candidate p2) {
         Random rand = new Random();
-        int start = rand.nextInt(Graph.nodesNumber - 1) + 1;
-        int end = rand.nextInt(Graph.nodesNumber - start) + start;
+        int start = rand.nextInt(graph.getNodesNumber() - 1) + 1;
+        int end = rand.nextInt(graph.getNodesNumber() - start) + start;
 
-        List<Integer> childChromosome = new ArrayList<>(Collections.nCopies(Graph.nodesNumber, -1));
+        List<Integer> childChromosome = new ArrayList<>(Collections.nCopies(graph.getNodesNumber(), -1));
         childChromosome.set(0, 0);
         for (int i = start; i <= end; i++) {
             childChromosome.set(i, p1.chromosome.get(i));
         }
 
-        int currentIndex = (end + 1) % Graph.nodesNumber;
-        for (int i = 1; i < Graph.nodesNumber; i++) {
-            int index = (end + 1 + i) % Graph.nodesNumber;
+        int currentIndex = (end + 1) % graph.getNodesNumber();
+        for (int i = 1; i < graph.getNodesNumber(); i++) {
+            int index = (end + 1 + i) % graph.getNodesNumber();
             int gene = p2.chromosome.get(index);
             if (!childChromosome.contains(gene)) {
                 childChromosome.set(currentIndex, gene);
-                currentIndex = (currentIndex + 1) % Graph.nodesNumber;
+                currentIndex = (currentIndex + 1) % graph.getNodesNumber();
             }
         }
 
-        return new Candidate(childChromosome);
+        return new Candidate(childChromosome, graph);
     }
 
 }

@@ -3,7 +3,7 @@ package GA;
 import java.util.List;
 
 public class Parameters {
-    public static int nodesPerVehicle = 1000;
+    public static int nodesPerVehicle = 10;
     static double finalPathLength = Double.MAX_VALUE;
     static List<Integer> bestPath;
     static int populationSize = 300;
@@ -24,6 +24,7 @@ public class Parameters {
 
     public static String fileName = "berlin52.tsp";
     // public static String fileName = "rat783.tsp";
+    public static boolean useGraph4j = false;
 
     public static void setNodesPerVehicle(int nodesPerVehicle) {
         Parameters.nodesPerVehicle = nodesPerVehicle;

@@ -1,22 +1,23 @@
 package GA;
 
-import Data.Graph;
+import Data.CustomGraph;
 import java.util.*;
 
 
 public class VehicleRouting {
+    private CustomGraph graph;
 
     public void run() {
-        Graph graph = new Graph();
-        GA();
+        graph = new CustomGraph();
+        GA(graph);
     }
 
-    private void GA() {
+    private void GA(CustomGraph graph) {
         Parameters.bestPath = new ArrayList<>();
         int noChange = 0;
         List<Candidate> population = new ArrayList<>(Parameters.populationSize);
         for (int i = 0; i < Parameters.populationSize; i++) {
-            population.add(new Candidate());
+            population.add(new Candidate(graph));
         }
 
         double mutationRate = Parameters.mutationProbability;
@@ -54,7 +55,7 @@ public class VehicleRouting {
                 double probability = Math.random();
                 if (probability < Parameters.crossoverProbability) {
                     if (j != Parameters.populationSize - 1) {
-                        population.set(j, Candidate.crossoverPMX(population.get(j), population.get(j + 1)));
+                        population.set(j, Candidate.crossoverPMX(population.get(j), population.get(j + 1), graph));
                     }
                 }
             }
@@ -64,7 +65,7 @@ public class VehicleRouting {
             // Last five percent will be reset
             if (Parameters.ReverseElitism) {
                 for (int j = 0; j < Parameters.elitism; j++) {
-                    population.set(j, new Candidate());
+                    population.set(j, new Candidate(graph));
                 }
             }
 
@@ -75,7 +76,7 @@ public class VehicleRouting {
                     List<Integer> consensusPath = wisdomOfCrowds(population);
                     int numConsensus = Parameters.populationSize / 10;
                     for (int j = 0; j < numConsensus; j++) {
-                        population.set(j, new Candidate(consensusPath));
+                        population.set(j, new Candidate(consensusPath, graph));
                     }
                 }
             } else {
@@ -145,7 +146,7 @@ public class VehicleRouting {
     }
 
     private void showBestPath() {
-        for (int i = 0; i < Graph.nodesNumber; i++) {
+        for (int i = 0; i < graph.getNodesNumber(); i++) {
             System.out.print(Parameters.bestPath.get(i) + " ");
             if(i!=0 && i % Parameters.nodesPerVehicle == 0) {
                 System.out.print("0 ");

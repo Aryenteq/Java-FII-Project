@@ -1,6 +1,6 @@
 package SA;
 
-import Data.Graph;
+import Data.CustomGraph;
 import GA.Candidate;
 import GA.Parameters;
 
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class SimulatedAnnealing {
-    public static void SA(List<Candidate> population) {
+    public static void SA(List<Candidate> population, CustomGraph graph) {
         for (Candidate it : population) {
             double bestPath, t = 1, temperature = 100;
             int index = 0;
@@ -20,7 +20,7 @@ public class SimulatedAnnealing {
                     bestPath = Double.MAX_VALUE;
 
                     // Get the best neighbour
-                    for (int i = 0; i < Graph.nodesNumber - 1; i++) {
+                    for (int i = 0; i < graph.getNodesNumber() - 1; i++) {
                         // Mutate (get a neighbour)
                         it.changeChromosome(i, 1);
                         it.calculateFitness();
