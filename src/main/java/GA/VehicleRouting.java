@@ -94,7 +94,7 @@ public class VehicleRouting {
             System.out.println("Generation " + i + " of " + Parameters.generations);
         }
 
-        // Ensure program exits correctly
+        // Finish
         System.out.println("Algorithm completed.");
     }
 

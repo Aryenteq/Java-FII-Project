@@ -8,9 +8,13 @@ import java.util.Random;
 import Data.CustomGraph;
 
 /* Keep in mind that 0 is the first node, always
+    (it being the depot)
     Therefore, some restrictions appear in the code
     Such as indexes starting from 1 (I know, horrible)
     And injecting the node 0 in the chromosome
+
+    Also, the graph object is always passed because graph4j
+    doesn't accept static objects - which is pretty fair
     */
 
 public class Candidate implements Comparable<Candidate> {
@@ -19,6 +23,7 @@ public class Candidate implements Comparable<Candidate> {
     double fitness;
     CustomGraph graph;
 
+    // Used in the crossover for example
     public Candidate(List<Integer> order, CustomGraph graph) {
         this.graph = graph;
         this.chromosome = new ArrayList<>(order);
@@ -28,6 +33,7 @@ public class Candidate implements Comparable<Candidate> {
         calculateFitness();
     }
 
+    // Random permutation
     public Candidate(CustomGraph graph) {
         this.graph = graph;
         chromosome = new ArrayList<>();
@@ -81,6 +87,7 @@ public class Candidate implements Comparable<Candidate> {
         return this.fitness;
     }
 
+    // Swap two alleles
     public void mutate(double prob) {
         Random rand = new Random();
         for (int i = 1; i < chromosome.size(); i++) {
@@ -129,6 +136,7 @@ public class Candidate implements Comparable<Candidate> {
         return new Candidate(childChromosome, graph);
     }
 
+    // Used only in SA
     public void changeChromosome(int index, int addedNumber) {
         int newValue = (chromosome.get(index) + addedNumber) % graph.getNodesNumber();
         if (newValue < 0) {
@@ -162,11 +170,11 @@ public class Candidate implements Comparable<Candidate> {
         int d = chromosome.get((j + 1) % chromosome.size());
 
         if (!Parameters.useGraph4j) {
-            // Use distances matrix
+            // Custom graph
             return graph.getDistances().get(a).get(c) + graph.getDistances().get(b).get(d) -
                     (graph.getDistances().get(a).get(b) + graph.getDistances().get(c).get(d));
         } else {
-            // Use Graph4J graph object
+            // Graph4j - a lot of iterators...
             double distanceAC = 0;
             double distanceBD = 0;
             double distanceAB = 0;
