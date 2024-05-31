@@ -1,75 +1,18 @@
 package GA;
 
-import java.io.InputStream;
+import Data.Graph;
 import java.util.*;
 
-import static SA.SimulatedAnnealing.SA;
 
 public class VehicleRouting {
 
-    public static void run() {
-        Parameters.graph = readFile();
+    public void run() {
+        //printDistances(Parameters.graph);
+        Graph graph = new Graph();
         GA();
     }
 
-    static Graph readFile() {
-        Graph graph = new Graph();
-        String filePath = STR."/Routes/\{Parameters.fileName}";
-        try (InputStream inputStream = VehicleRouting.class.getResourceAsStream(filePath)) {
-            if (inputStream == null) {
-                throw new IllegalArgumentException(STR."File not found: \{filePath}");
-            }
-            try (Scanner file = new Scanner(inputStream)) {
-                while (file.hasNextLine()) {
-                    String line = file.nextLine();
-                    if (line.contains("NAME")) {
-                        graph.name = line.split(":")[1].trim();
-                    } else if (line.contains("DIMENSION")) {
-                        graph.nodesNumber = Integer.parseInt(line.split(":")[1].trim());
-                        graph.nodeArr = new ArrayList<>(graph.nodesNumber);
-                        graph.distances = new ArrayList<>(graph.nodesNumber);
-                        for (int i = 0; i < graph.nodesNumber; i++)
-                            graph.distances.add(new ArrayList<>(Collections.nCopies(graph.nodesNumber, 0.0)));
-                    } else if (line.contains("EDGE_WEIGHT_TYPE")) {
-                        graph.edgeWeightType = line.split(":")[1].trim();
-                    } else if (line.contains("NODE_COORD_SECTION")) {
-                        break;
-                    }
-                }
-
-                for (int i = 0; i < graph.nodesNumber; i++) {
-                    String[] tokens = file.nextLine().trim().split("\\s+");
-                    if (tokens.length != 3) {
-                        throw new IllegalArgumentException(STR."Invalid node data format: \{Arrays.toString(tokens)}");
-                    }
-                    graph.nodeArr.add(new Node(i,
-                            Integer.parseInt(tokens[0]),
-                            Float.parseFloat(tokens[1]),
-                            Float.parseFloat(tokens[2])
-                    ));
-                }
-
-                if (graph.edgeWeightType.equals("EUC_2D")) {
-                    for (int i = 0; i < graph.nodesNumber; i++) {
-                        for (int j = 0; j < graph.nodesNumber; j++) {
-                            if (i != j) {
-                                Node n1 = graph.nodeArr.get(i);
-                                Node n2 = graph.nodeArr.get(j);
-                                double distance = Math.sqrt(Math.pow(n1.x - n2.x, 2) + Math.pow(n1.y - n2.y, 2));
-                                graph.distances.get(i).set(j, (double) Math.round(distance));
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Parameters.noOfNodes = graph.nodesNumber;
-        return graph;
-    }
-
-    static void GA() {
+    private void GA() {
         Parameters.bestPath = new ArrayList<>();
         int noChange = 0;
         List<Candidate> population = new ArrayList<>(Parameters.populationSize);
@@ -77,22 +20,31 @@ public class VehicleRouting {
             population.add(new Candidate());
         }
 
+        double mutationRate = Parameters.mutationProbability;
+
         for (int i = 0; i < Parameters.generations; i++) {
             double oldFinalPathLength = Parameters.finalPathLength;
 
             // Selection
-            selection(population, 0.5);
+            selection(population);
 
             // Mutation
             for (Candidate candidate : population) {
-                candidate.mutate(Parameters.mutationProbability);
+                candidate.mutate(mutationRate);
             }
 
-            // Hypermutation
-            if (Parameters.Hypermutation) {
-                if (noChange % Parameters.maxStagnationUntilHypermutation == 0 && noChange != 0) {
+            // Conditional Local Search
+            if (noChange > Parameters.maxStagnationUntil2Opt) {
+                for (Candidate candidate : population) {
+                    candidate.localSearch();
+                }
+            }
+
+            // HyperMutation
+            if (Parameters.HyperMutation) {
+                if (noChange > Parameters.maxStagnationUntilHyperMutation) {
                     for (Candidate individual : population) {
-                        individual.mutate(Parameters.hypermutationProbability);
+                        individual.mutate(Parameters.hyperMutationProbability);
                     }
                 }
             }
@@ -103,7 +55,7 @@ public class VehicleRouting {
                 double probability = Math.random();
                 if (probability < Parameters.crossoverProbability) {
                     if (j != Parameters.populationSize - 1) {
-                        population.set(j, Candidate.crossover(population.get(j), population.get(j + 1)));
+                        population.set(j, Candidate.crossoverPMX(population.get(j), population.get(j + 1)));
                     }
                 }
             }
@@ -117,33 +69,37 @@ public class VehicleRouting {
                 }
             }
 
-            // Reset the rest of the population if there's too much stagnation
+            // Wisdom
             if (Parameters.finalPathLength == oldFinalPathLength) {
                 noChange++;
-            } else {
-                // SA(population); // -- ?? doesn't work, algorithm gets stuck here
-                noChange = 0;
-            }
-
-            if (noChange == Parameters.maxStagnationUntilSA && Parameters.Stagnation) {
-                for (int j = Parameters.elitism; j < Parameters.populationSize - Parameters.elitism; j++) {
-                    double probability = Math.random();
-                    if (probability < Parameters.extinctProbability) {
-                        population.set(j, new Candidate());
+                if (noChange > Parameters.maxStagnationUntilWisdom) {
+                    List<Integer> consensusPath = wisdomOfCrowds(population);
+                    int numConsensus = Parameters.populationSize / 10;
+                    for (int j = 0; j < numConsensus; j++) {
+                        population.set(j, new Candidate(consensusPath));
                     }
                 }
+            } else {
                 noChange = 0;
+                mutationRate = Parameters.mutationProbability; // Reset when improved
             }
-            System.out.print(STR."\{Parameters.finalPathLength} ");
+
+            // Adaptive Mutation Rate
+            if (noChange > Parameters.maxStagnationUntilAdaptiveMutation) {
+                mutationRate *= 1.05; // Increase mutation rate
+            }
+
+            System.out.print(Parameters.finalPathLength + " ");
             showBestPath();
-            System.out.println(STR."Generation \{i} of \{Parameters.generations}");
+            System.out.println("Generation " + i + " of " + Parameters.generations);
         }
 
         // Ensure program exits correctly
         System.out.println("Algorithm completed.");
     }
 
-    static void selection(List<Candidate> population, double selectionPressure) {
+
+    private void selection(List<Candidate> population) {
         List<Candidate> newPopulation = new ArrayList<>();
 
         if (Parameters.Elitism) {
@@ -172,6 +128,7 @@ public class VehicleRouting {
 
         Random random = new Random();
 
+        // Binary search doesn't get the same results as this, idk why
         for (int i = 0; i < Parameters.populationSize - 1 - helperToMaintainPopSize; i++) {
             double probability = random.nextDouble();
             int selectedIndex = 0;
@@ -184,47 +141,37 @@ public class VehicleRouting {
             newPopulation.add(population.get(selectedIndex));
         }
 
-        selectionPressure *= Parameters.selectionPressureAdjustment;
         population.clear();
         population.addAll(newPopulation);
     }
 
-    static void showBestPath() {
-        for (int i = 0; i < Parameters.noOfNodes; i++) {
-            System.out.print(STR."\{Parameters.bestPath.get(i)} ");
+    private void showBestPath() {
+        for (int i = 0; i < Graph.nodesNumber; i++) {
+            System.out.print(Parameters.bestPath.get(i) + " ");
+            if(i!=0 && i % Parameters.nodesPerVehicle == 0) {
+                System.out.print("0 ");
+            }
         }
         System.out.println();
     }
-}
 
-//    static void OptimizedPath() {
-//        try (Scanner file = new Scanner(Objects.requireNonNull(VehicleRouting.class.getResourceAsStream(STR."/Routes\{Parameters.fileName}")))) {
-//            boolean tourSectionFound = false;
-//            int lastNumber = -1;
-//            double confirmedBestPath = 0;
-//            while (file.hasNextLine()) {
-//                String line = file.nextLine();
-//                if (line.contains("TOUR_SECTION")) {
-//                    tourSectionFound = true;
-//                    continue;
-//                }
-//                if (tourSectionFound) {
-//                    String[] tokens = line.trim().split("\\s+");
-//                    for (String token : tokens) {
-//                        int number = Integer.parseInt(token);
-//                        if (lastNumber != -1) {
-//                            confirmedBestPath += Parameters.graph.distances.get(lastNumber - 1).get(number - 1);
-//                            lastNumber = number;
-//                        } else {
-//                            lastNumber = number;
-//                        }
-//                    }
-//                    if (tokens[tokens.length - 1].equals("-1"))
-//                        break;
-//                }
-//            }
-//            System.out.println("\nReal best path distance: " + confirmedBestPath);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+    // Wisdom of Crowds
+    private List<Integer> wisdomOfCrowds(List<Candidate> population) {
+        Map<Integer, Integer> nodeFrequency = new HashMap<>();
+        for (Candidate candidate : population) {
+            for (Integer node : candidate.chromosome) {
+                nodeFrequency.put(node, nodeFrequency.getOrDefault(node, 0) + 1);
+            }
+        }
+
+        List<Map.Entry<Integer, Integer>> sortedNodes = new ArrayList<>(nodeFrequency.entrySet());
+        sortedNodes.sort((e1, e2) -> e2.getValue().compareTo(e1.getValue()));
+
+        List<Integer> consensusPath = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : sortedNodes) {
+            consensusPath.add(entry.getKey());
+        }
+
+        return consensusPath;
+    }
+}

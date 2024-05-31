@@ -1,5 +1,6 @@
 package org.example.demo;
 
+import GA.Parameters;
 import GA.VehicleRouting;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -20,7 +21,9 @@ public class HelloApplication extends Application {
     }
 
     public static void main(String[] args) {
-        launch();
-        //VehicleRouting.run();
+        //launch();
+        GA.Parameters.setGenerations(1000);
+        VehicleRouting solver = new VehicleRouting();
+        solver.run();
     }
 }
