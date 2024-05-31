@@ -1,20 +1,18 @@
 package GA;
 
 import Data.Graph;
-
-import java.io.InputStream;
 import java.util.*;
 
 
 public class VehicleRouting {
 
-    public static void run() {
+    public void run() {
         //printDistances(Parameters.graph);
         Graph graph = new Graph();
         GA();
     }
 
-    static void GA() {
+    private void GA() {
         Parameters.bestPath = new ArrayList<>();
         int noChange = 0;
         List<Candidate> population = new ArrayList<>(Parameters.populationSize);
@@ -42,11 +40,11 @@ public class VehicleRouting {
                 }
             }
 
-            // Hypermutation
-            if (Parameters.Hypermutation) {
-                if (noChange > Parameters.maxStagnationUntilHypermutation) {
+            // HyperMutation
+            if (Parameters.HyperMutation) {
+                if (noChange > Parameters.maxStagnationUntilHyperMutation) {
                     for (Candidate individual : population) {
-                        individual.mutate(Parameters.hypermutationProbability);
+                        individual.mutate(Parameters.hyperMutationProbability);
                     }
                 }
             }
@@ -101,7 +99,7 @@ public class VehicleRouting {
     }
 
 
-    static void selection(List<Candidate> population) {
+    private void selection(List<Candidate> population) {
         List<Candidate> newPopulation = new ArrayList<>();
 
         if (Parameters.Elitism) {
@@ -147,7 +145,7 @@ public class VehicleRouting {
         population.addAll(newPopulation);
     }
 
-    static void showBestPath() {
+    private void showBestPath() {
         for (int i = 0; i < Graph.nodesNumber; i++) {
             System.out.print(Parameters.bestPath.get(i) + " ");
             if(i!=0 && i % Parameters.nodesPerVehicle == 0) {
@@ -158,7 +156,7 @@ public class VehicleRouting {
     }
 
     // Wisdom of Crowds
-    static List<Integer> wisdomOfCrowds(List<Candidate> population) {
+    private List<Integer> wisdomOfCrowds(List<Candidate> population) {
         Map<Integer, Integer> nodeFrequency = new HashMap<>();
         for (Candidate candidate : population) {
             for (Integer node : candidate.chromosome) {
