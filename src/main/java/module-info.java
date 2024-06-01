@@ -12,6 +12,7 @@ module org.example.demo {
     requires com.almasb.fxgl.all;
     requires graph4j;
     requires annotations;
+    requires java.sql;
 
     opens org.example.demo to javafx.fxml;
     exports org.example.demo;

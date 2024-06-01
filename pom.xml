@@ -112,11 +112,20 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- GRAPH4J -->
         <dependency>
             <groupId>org.graph4j</groupId>
             <artifactId>graph4j</artifactId>
             <version>1.0.7</version>
         </dependency>
+
+        <!-- DATABASE -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+        </dependency>
+
     </dependencies>
 
     <build>
