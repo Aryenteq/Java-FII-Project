@@ -1,6 +1,6 @@
 package org.example.demo;
 
-import Data.Graph;
+import Data.CustomGraph;
 import Data.Node;
 import GA.Parameters;
 import javafx.stage.FileChooser;
@@ -27,7 +27,7 @@ public class SetSelector {
     public static List<CoordsPair> parse(String path){
         List<CoordsPair> pairs = new ArrayList<>();
         Parameters.setFileName(path);
-        Graph decodedNodes = new Graph();
+        CustomGraph decodedNodes = new CustomGraph();
         for (Node node : decodedNodes.getNodeArr()) {
             //System.out.println(new CoordsPair(node.x(), node.y()));
             pairs.add(new CoordsPair(node.x(), node.y()));

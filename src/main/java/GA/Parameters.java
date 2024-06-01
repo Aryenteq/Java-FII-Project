@@ -87,7 +87,9 @@ public class Parameters {
     }
 
     public static double getFinalPathLength() {
-        return finalPathLength;
+        // NOT WORKING
+        return 0;
+        // return finalPathLength;
     }
 
     public static double getHyperMutationProbability() {
