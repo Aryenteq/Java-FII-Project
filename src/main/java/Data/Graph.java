@@ -3,6 +3,7 @@ package Data;
 import GA.Parameters;
 import GA.VehicleRouting;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
 
@@ -67,6 +68,10 @@ public class Graph {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public List<Node> getNodeArr() {
+        return nodeArr;
     }
 
     void printDistances() {

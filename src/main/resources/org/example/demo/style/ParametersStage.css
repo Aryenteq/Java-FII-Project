@@ -1,0 +1,86 @@
+@font-face {
+    font-family: 'coolvetica';
+    src: url('./coolveticaRg.otf') format('openyype'),
+}
+
+.actionButton {
+    -fx-background-color: #F4442E;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, derive(#F4442E, -20%), 0, 0, 3, 3);
+
+    -fx-text-fill: #F2F3AE;
+    -fx-font-family: coolvetica;
+    -fx-font-size: 20;
+    -fx-font-weight: Bolder;
+}
+
+.actionButton:hover {
+    -fx-background-color: derive(#F4442E, -10%);
+    -fx-text-fill: derive(#F2F3AE, -10%);
+}
+
+.actionButton:pressed {
+    -fx-background-color: derive(#F4442E, -20%);
+    -fx-text-fill: derive(#F2F3AE, -20%);
+}
+
+.settingSelector {
+    -fx-background-color: #31263e;
+    -fx-background-radius: 10;
+
+    -fx-text-fill: #8876A2;
+    -fx-font-family: coolvetica;
+    -fx-font-size: 20;
+    -fx-font-weight: Bolder;
+}
+
+.settingSelector:hover {
+    -fx-background-color: derive(#31263e, -10%);
+    -fx-text-fill: derive(#8876A2, -10%);
+}
+
+.settingSelector:pressed {
+    -fx-background-color: derive(#31263e, -20%);
+    -fx-text-fill: derive(#8876A2, -20%);
+}
+
+
+.menu {
+    -fx-background-color: #31263e;
+    -fx-alignment: center;
+    -fx-background-radius: 10;
+}
+
+.hLine {
+    -fx-background-color: #31263e;
+}
+
+.label {
+    -fx-text-fill: #8876A2;
+    -fx-font-family: coolvetica;
+    -fx-font-size: 20;
+    -fx-font-weight: Bolder;
+    -fx-alignment: center;
+}
+
+.popUp {
+    -fx-background-color:black;
+}
+
+.checkBox {
+    -fx-background-color: #31263e;
+}
+
+.checkBox .box {
+    -fx-background-color: #44355B;
+}
+
+.checkBox:selected .box .mark {
+    -fx-background-color: #221E22;
+}
+
+#inputField {
+    -fx-background-color: #44355B;
+    -fx-text-fill: #8876A2;
+    -fx-font-weight: bold;
+}

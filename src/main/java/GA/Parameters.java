@@ -81,8 +81,64 @@ public class Parameters {
     public static void setHyperMutation(boolean hyperMutation) {
         HyperMutation = hyperMutation;
     }
-
+    // 14 parametrii
     public static void setFileName(String fileName) {
         Parameters.fileName = fileName;
+    }
+
+    public static double getCrossoverProbability() {
+        return crossoverProbability;
+    }
+
+    public static double getFinalPathLength() {
+        return finalPathLength;
+    }
+
+    public static double getHyperMutationProbability() {
+        return hyperMutationProbability;
+    }
+
+    public static double getMutationProbability() {
+        return mutationProbability;
+    }
+
+    public static int getElitism() {
+        return elitism;
+    }
+
+    public static int getGenerations() {
+        return generations;
+    }
+
+    public static int getMaxStagnationUntil2Opt() {
+        return maxStagnationUntil2Opt;
+    }
+
+    public static int getMaxStagnationUntilAdaptiveMutation() {
+        return maxStagnationUntilAdaptiveMutation;
+    }
+
+    public static int getMaxStagnationUntilHyperMutation() {
+        return maxStagnationUntilHyperMutation;
+    }
+
+    public static int getMaxStagnationUntilWisdom() {
+        return maxStagnationUntilWisdom;
+    }
+
+    public static int getNodesPerVehicle() {
+        return nodesPerVehicle;
+    }
+
+    public static int getPopulationSize() {
+        return populationSize;
+    }
+
+    public static boolean isReverseElitism() {
+        return ReverseElitism;
+    }
+
+    public static boolean isHyperMutation() {
+        return HyperMutation;
     }
 }

@@ -7,7 +7,6 @@ import java.util.*;
 public class VehicleRouting {
 
     public void run() {
-        //printDistances(Parameters.graph);
         Graph graph = new Graph();
         GA();
     }
