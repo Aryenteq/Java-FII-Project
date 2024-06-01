@@ -1,9 +1,12 @@
 package Data;
 
+import Database.LocationDAO;
 import GA.Parameters;
 import GA.VehicleRouting;
 
 import java.io.InputStream;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 import org.graph4j.Graph;
@@ -18,6 +21,69 @@ public class CustomGraph {
     private Graph graph;
 
     public CustomGraph() {
+        if (Parameters.useDatabase) {
+            initializeGraphFromDB();
+        } else {
+            initializeGraphFromFile();
+        }
+    }
+
+    private void initializeGraphFromDB() {
+        try {
+            LocationDAO locationDAO = new LocationDAO();
+            name = "Database";
+            nodeArr = new ArrayList<>();
+            ResultSet resultSet = locationDAO.getUnsolvedLocations();
+
+            int index = 0;
+            while (resultSet.next()) {
+                double latitude = resultSet.getDouble("latitude");
+                double longitude = resultSet.getDouble("longitude");
+                nodeArr.add(new Node(index, (float) latitude, (float) longitude));
+                index++;
+            }
+            nodesNumber = nodeArr.size();
+
+            if (!Parameters.useGraph4j) {
+                distances = new ArrayList<>(nodesNumber);
+                for (int i = 0; i < nodesNumber; i++)
+                    distances.add(new ArrayList<>(Collections.nCopies(nodesNumber, 0.0)));
+            }
+
+            if (Parameters.useGraph4j) {
+                graph = GraphBuilder.empty()
+                        .estimatedNumVertices(nodesNumber)
+                        .estimatedAvgDegree(nodesNumber - 1)
+                        .buildGraph();
+                for (int i = 0; i < nodesNumber; i++) {
+                    graph.addVertex(i);
+                }
+            }
+
+            edgeWeightType = "EUC_2D";
+            for (int i = 0; i < nodesNumber; i++) {
+                for (int j = 0; j < nodesNumber; j++) {
+                    if (i != j) {
+                        Node n1 = nodeArr.get(i);
+                        Node n2 = nodeArr.get(j);
+
+                        double distance = haversineDistance(n1, n2);
+
+                        if (!Parameters.useGraph4j) {
+                            distances.get(i).set(j, distance);
+                        } else if (i < j) {
+                            graph.addEdge(i, j, distance);
+                        }
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initializeGraphFromFile() {
         String filePath = "/Routes/" + Parameters.fileName;
         try (InputStream inputStream = VehicleRouting.class.getResourceAsStream(filePath)) {
             if (inputStream == null) {
@@ -31,7 +97,7 @@ public class CustomGraph {
                     } else if (line.contains("DIMENSION")) {
                         nodesNumber = Integer.parseInt(line.split(":")[1].trim());
                         nodeArr = new ArrayList<>(nodesNumber);
-                        if(!Parameters.useGraph4j) {
+                        if (!Parameters.useGraph4j) {
                             distances = new ArrayList<>(nodesNumber);
                             for (int i = 0; i < nodesNumber; i++)
                                 distances.add(new ArrayList<>(Collections.nCopies(nodesNumber, 0.0)));
@@ -55,7 +121,7 @@ public class CustomGraph {
                     ));
                 }
 
-                if(Parameters.useGraph4j) {
+                if (Parameters.useGraph4j) {
                     graph = GraphBuilder.empty()
                             .estimatedNumVertices(nodesNumber)
                             .estimatedAvgDegree(nodesNumber - 1)
@@ -75,9 +141,9 @@ public class CustomGraph {
 
                                 double distance = Math.sqrt(Math.pow(n1.x() - n2.x(), 2) + Math.pow(n1.y() - n2.y(), 2));
 
-                                if(!Parameters.useGraph4j) {
+                                if (!Parameters.useGraph4j) {
                                     distances.get(i).set(j, distance);
-                                } else if(i < j){
+                                } else if (i < j) {
                                     graph.addEdge(i, j, distance);
                                 }
                             }
@@ -89,6 +155,24 @@ public class CustomGraph {
             e.printStackTrace();
         }
     }
+
+    // If DB is used - temporary (or not) get the distance in km
+    // Based on Earths curve
+    private double haversineDistance(Node n1, Node n2) {
+        final int R = 6371; // Radius of the Earth in kilometers
+        double lat1 = n1.x();
+        double lon1 = n1.y();
+        double lat2 = n2.x();
+        double lon2 = n2.y();
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; // convert to kilometers
+    }
+
 
 
     public int getNodesNumber() {

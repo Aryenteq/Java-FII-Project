@@ -34,6 +34,9 @@ public class HelloApplication extends Application {
             //locationDAO.addLocation("Sample Location", 37.7749, -122.4194, false);
             //locationDAO.updateSolvedStatus(2, true);
             //locationDAO.deleteLocation(4);
+            //locationDAO.deleteAll();
+
+
 
         } catch (SQLException e) {
             e.printStackTrace();

@@ -2,6 +2,7 @@ package Database;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class LocationDAO {
@@ -22,6 +23,15 @@ public class LocationDAO {
         }
     }
 
+    public void updateSolvedStatus(int id, boolean solved) throws SQLException {
+        String query = "UPDATE Locations SET solved = ? WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setBoolean(1, solved);
+            preparedStatement.setInt(2, id);
+            preparedStatement.executeUpdate();
+        }
+    }
+
     public void deleteLocation(int id) throws SQLException {
         String query = "DELETE FROM Locations WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -30,13 +40,17 @@ public class LocationDAO {
         }
     }
 
-    public void updateSolvedStatus(int id, boolean solved) throws SQLException {
-        String query = "UPDATE Locations SET solved = ? WHERE id = ?";
+    public void deleteAll() throws SQLException {
+        String query = "DELETE FROM Locations";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setBoolean(1, solved);
-            preparedStatement.setInt(2, id);
             preparedStatement.executeUpdate();
         }
+    }
+
+    public ResultSet getUnsolvedLocations() throws SQLException {
+        String query = "SELECT * FROM Locations WHERE solved = 0";
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        return preparedStatement.executeQuery();
     }
 }
 
