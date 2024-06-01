@@ -3,28 +3,28 @@ package GA;
 import java.util.List;
 
 public class Parameters {
-    public static int nodesPerVehicle = 1000;
-    static double finalPathLength = Double.MAX_VALUE;
+    public static int nodesPerVehicle = 10;
+    public static double avgPathLength = Double.MAX_VALUE;
+    static double bestPathLength = Double.MAX_VALUE;
     static List<Integer> bestPath;
     static int populationSize = 300;
     static int generations = 1000;
     static double mutationProbability = 0.001;
     static double hyperMutationProbability = 0.1;
     static double crossoverProbability = 0.8;
-    static int elitism = 5 * populationSize / 100;
     static int maxStagnationUntilAdaptiveMutation = 30;
     static int maxStagnationUntilHyperMutation = 50;
-    static int maxStagnationUntilWisdom = 100;
-    static int maxStagnationUntil2Opt = 150;
+    static int maxStagnationUntilWisdom = 80;
+    static int maxStagnationUntil2Opt = 100;
 
 
-    static boolean Elitism = true;
-    static boolean ReverseElitism = true;
-    static boolean HyperMutation = true;
+    static int elitism = 5 * populationSize / 100;
+    static boolean ReverseElitism = false;
+    static boolean HyperMutation = false;
 
     public static String fileName = "berlin52.tsp";
     // public static String fileName = "rat783.tsp";
-
+    public static boolean useGraph4j = false;
 
     public static void setNodesPerVehicle(int nodesPerVehicle) {
         Parameters.nodesPerVehicle = nodesPerVehicle;
@@ -68,10 +68,6 @@ public class Parameters {
 
     public static void setMaxStagnationUntil2Opt(int maxStagnationUntil2Opt) {
         Parameters.maxStagnationUntil2Opt = maxStagnationUntil2Opt;
-    }
-
-    public static void setElitism(boolean elitism) {
-        Elitism = elitism;
     }
 
     public static void setReverseElitism(boolean reverseElitism) {

@@ -7,14 +7,19 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
 
-public class Graph {
+import org.graph4j.Graph;
+import org.graph4j.GraphBuilder;
+
+
+public class CustomGraph {
     public static int nodesNumber;
     public static List<List<Double>> distances;
     private String name;
     private List<Node> nodeArr;
     private String edgeWeightType;
+    private Graph graph;
 
-    public Graph() {
+    public CustomGraph() {
         String filePath = "/Routes/" + Parameters.fileName;
         try (InputStream inputStream = VehicleRouting.class.getResourceAsStream(filePath)) {
             if (inputStream == null) {
@@ -28,9 +33,11 @@ public class Graph {
                     } else if (line.contains("DIMENSION")) {
                         nodesNumber = Integer.parseInt(line.split(":")[1].trim());
                         nodeArr = new ArrayList<>(nodesNumber);
-                        distances = new ArrayList<>(nodesNumber);
-                        for (int i = 0; i < nodesNumber; i++)
-                            distances.add(new ArrayList<>(Collections.nCopies(nodesNumber, 0.0)));
+                        if(!Parameters.useGraph4j) {
+                            distances = new ArrayList<>(nodesNumber);
+                            for (int i = 0; i < nodesNumber; i++)
+                                distances.add(new ArrayList<>(Collections.nCopies(nodesNumber, 0.0)));
+                        }
                     } else if (line.contains("EDGE_WEIGHT_TYPE")) {
                         edgeWeightType = line.split(":")[1].trim();
                     } else if (line.contains("NODE_COORD_SECTION")) {
@@ -50,6 +57,16 @@ public class Graph {
                     ));
                 }
 
+                if(Parameters.useGraph4j) {
+                    graph = GraphBuilder.empty()
+                            .estimatedNumVertices(nodesNumber)
+                            .estimatedAvgDegree(nodesNumber - 1)
+                            .buildGraph();
+                    for (int i = 0; i < nodesNumber; i++) {
+                        graph.addVertex(i);
+                    }
+                }
+
                 assert edgeWeightType != null;
                 if (edgeWeightType.equals("EUC_2D")) {
                     for (int i = 0; i < nodesNumber; i++) {
@@ -59,7 +76,12 @@ public class Graph {
                                 Node n2 = nodeArr.get(j);
 
                                 double distance = Math.sqrt(Math.pow(n1.x() - n2.x(), 2) + Math.pow(n1.y() - n2.y(), 2));
-                                distances.get(i).set(j, distance);
+
+                                if(!Parameters.useGraph4j) {
+                                    distances.get(i).set(j, distance);
+                                } else if(i < j){
+                                    graph.addEdge(i, j, distance);
+                                }
                             }
                         }
                     }
@@ -72,6 +94,18 @@ public class Graph {
 
     public List<Node> getNodeArr() {
         return nodeArr;
+    }
+
+    public int getNodesNumber() {
+        return nodesNumber;
+    }
+
+    public List<List<Double>> getDistances() {
+        return distances;
+    }
+
+    public Graph getGraph() {
+        return graph;
     }
 
     void printDistances() {

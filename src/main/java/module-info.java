@@ -11,6 +11,8 @@ module org.example.demo {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.desktop;
+    requires graph4j;
+    requires annotations;
 
     opens org.example.demo to javafx.fxml;
     exports org.example.demo;

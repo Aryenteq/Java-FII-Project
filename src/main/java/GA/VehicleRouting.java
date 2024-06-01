@@ -1,28 +1,28 @@
 package GA;
 
-import Data.Graph;
+import Data.CustomGraph;
 import java.util.*;
 
 
 public class VehicleRouting {
 
     public void run() {
-        Graph graph = new Graph();
-        GA();
+        CustomGraph graph = new CustomGraph();
+        GA(graph);
     }
 
-    private void GA() {
+    private void GA(CustomGraph graph) {
         Parameters.bestPath = new ArrayList<>();
         int noChange = 0;
         List<Candidate> population = new ArrayList<>(Parameters.populationSize);
         for (int i = 0; i < Parameters.populationSize; i++) {
-            population.add(new Candidate());
+            population.add(new Candidate(graph));
         }
 
         double mutationRate = Parameters.mutationProbability;
 
         for (int i = 0; i < Parameters.generations; i++) {
-            double oldFinalPathLength = Parameters.finalPathLength;
+            double oldFinalPathLength = Parameters.bestPathLength;
 
             // Selection
             selection(population);
@@ -53,8 +53,8 @@ public class VehicleRouting {
             for (int j = 0; j < Parameters.populationSize - 1; j += 2) {
                 double probability = Math.random();
                 if (probability < Parameters.crossoverProbability) {
-                    if (j != Parameters.populationSize - 1) {
-                        population.set(j, Candidate.crossoverPMX(population.get(j), population.get(j + 1)));
+                    if (j < Parameters.populationSize - 1) {
+                        population.set(j, Candidate.crossoverPMX(population.get(j), population.get(j + 1), graph));
                     }
                 }
             }
@@ -64,18 +64,18 @@ public class VehicleRouting {
             // Last five percent will be reset
             if (Parameters.ReverseElitism) {
                 for (int j = 0; j < Parameters.elitism; j++) {
-                    population.set(j, new Candidate());
+                    population.set(j, new Candidate(graph));
                 }
             }
 
             // Wisdom
-            if (Parameters.finalPathLength == oldFinalPathLength) {
+            if (Parameters.bestPathLength == oldFinalPathLength) {
                 noChange++;
                 if (noChange > Parameters.maxStagnationUntilWisdom) {
                     List<Integer> consensusPath = wisdomOfCrowds(population);
                     int numConsensus = Parameters.populationSize / 10;
                     for (int j = 0; j < numConsensus; j++) {
-                        population.set(j, new Candidate(consensusPath));
+                        population.set(j, new Candidate(consensusPath, graph));
                     }
                 }
             } else {
@@ -88,12 +88,20 @@ public class VehicleRouting {
                 mutationRate *= 1.05; // Increase mutation rate
             }
 
-            System.out.print(Parameters.finalPathLength + " ");
-            showBestPath();
+            double result = 0;
+            for (Candidate individual : population) {
+                result += individual.getPathLength();
+            }
+            Parameters.avgPathLength = result/population.size();
+
             System.out.println("Generation " + i + " of " + Parameters.generations);
+            System.out.print(Parameters.bestPathLength + " ");
+            showBestPath();
+            System.out.println("Average path length: " + Parameters.avgPathLength);
+            System.out.println();
         }
 
-        // Ensure program exits correctly
+        // Finish
         System.out.println("Algorithm completed.");
     }
 
@@ -101,12 +109,10 @@ public class VehicleRouting {
     private void selection(List<Candidate> population) {
         List<Candidate> newPopulation = new ArrayList<>();
 
-        if (Parameters.Elitism) {
-            population.sort(Comparator.reverseOrder());
-            for (int i = Parameters.populationSize - 1; i >= Parameters.populationSize - 1 - Parameters.elitism; i--) {
-                newPopulation.add(population.get(i));
-                population.remove(i);
-            }
+        population.sort(Comparator.reverseOrder());
+        for (int i = Parameters.populationSize - 1; i >= Parameters.populationSize - 1 - Parameters.elitism; i--) {
+            newPopulation.add(population.get(i));
+            population.remove(i);
         }
 
         double fitnessSum = population.stream().mapToDouble(Candidate::getFitness).sum();
@@ -120,10 +126,7 @@ public class VehicleRouting {
             q.add(q.get(i) + prob.get(i));
         }
 
-        int helperToMaintainPopSize = 0;
-        if (Parameters.Elitism) {
-            helperToMaintainPopSize = Parameters.elitism;
-        }
+        int helperToMaintainPopSize = Parameters.elitism;
 
         Random random = new Random();
 
@@ -145,11 +148,8 @@ public class VehicleRouting {
     }
 
     private void showBestPath() {
-        for (int i = 0; i < Graph.nodesNumber; i++) {
+        for (int i = 0; i < Parameters.bestPath.size(); i++) {
             System.out.print(Parameters.bestPath.get(i) + " ");
-            if(i!=0 && i % Parameters.nodesPerVehicle == 0) {
-                System.out.print("0 ");
-            }
         }
         System.out.println();
     }
@@ -158,7 +158,7 @@ public class VehicleRouting {
     private List<Integer> wisdomOfCrowds(List<Candidate> population) {
         Map<Integer, Integer> nodeFrequency = new HashMap<>();
         for (Candidate candidate : population) {
-            for (Integer node : candidate.chromosome) {
+            for (Integer node : candidate.getChromosome()) {
                 nodeFrequency.put(node, nodeFrequency.getOrDefault(node, 0) + 1);
             }
         }
