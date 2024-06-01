@@ -4,7 +4,8 @@ import java.util.List;
 
 public class Parameters {
     public static int nodesPerVehicle = 10;
-    static double finalPathLength = Double.MAX_VALUE;
+    public static double avgPathLength = Double.MAX_VALUE;
+    static double bestPathLength = Double.MAX_VALUE;
     static List<Integer> bestPath;
     static int populationSize = 300;
     static int generations = 1000;
@@ -13,8 +14,8 @@ public class Parameters {
     static double crossoverProbability = 0.8;
     static int maxStagnationUntilAdaptiveMutation = 30;
     static int maxStagnationUntilHyperMutation = 50;
-    static int maxStagnationUntilWisdom = 100;
-    static int maxStagnationUntil2Opt = 150;
+    static int maxStagnationUntilWisdom = 80;
+    static int maxStagnationUntil2Opt = 100;
 
 
     static int elitism = 5 * populationSize / 100;

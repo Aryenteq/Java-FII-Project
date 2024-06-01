@@ -5,10 +5,9 @@ import java.util.*;
 
 
 public class VehicleRouting {
-    private CustomGraph graph;
 
     public void run() {
-        graph = new CustomGraph();
+        CustomGraph graph = new CustomGraph();
         GA(graph);
     }
 
@@ -23,7 +22,7 @@ public class VehicleRouting {
         double mutationRate = Parameters.mutationProbability;
 
         for (int i = 0; i < Parameters.generations; i++) {
-            double oldFinalPathLength = Parameters.finalPathLength;
+            double oldFinalPathLength = Parameters.bestPathLength;
 
             // Selection
             selection(population);
@@ -70,7 +69,7 @@ public class VehicleRouting {
             }
 
             // Wisdom
-            if (Parameters.finalPathLength == oldFinalPathLength) {
+            if (Parameters.bestPathLength == oldFinalPathLength) {
                 noChange++;
                 if (noChange > Parameters.maxStagnationUntilWisdom) {
                     List<Integer> consensusPath = wisdomOfCrowds(population);
@@ -89,9 +88,17 @@ public class VehicleRouting {
                 mutationRate *= 1.05; // Increase mutation rate
             }
 
-            System.out.print(Parameters.finalPathLength + " ");
-            showBestPath();
+            double result = 0;
+            for (Candidate individual : population) {
+                result += individual.getPathLength();
+            }
+            Parameters.avgPathLength = result/population.size();
+
             System.out.println("Generation " + i + " of " + Parameters.generations);
+            System.out.print(Parameters.bestPathLength + " ");
+            showBestPath();
+            System.out.println("Average path length: " + Parameters.avgPathLength);
+            System.out.println();
         }
 
         // Finish
@@ -141,11 +148,8 @@ public class VehicleRouting {
     }
 
     private void showBestPath() {
-        for (int i = 0; i < graph.getNodesNumber(); i++) {
+        for (int i = 0; i < Parameters.bestPath.size(); i++) {
             System.out.print(Parameters.bestPath.get(i) + " ");
-            if(i!=0 && i % Parameters.nodesPerVehicle == 0) {
-                System.out.print("0 ");
-            }
         }
         System.out.println();
     }
@@ -154,7 +158,7 @@ public class VehicleRouting {
     private List<Integer> wisdomOfCrowds(List<Candidate> population) {
         Map<Integer, Integer> nodeFrequency = new HashMap<>();
         for (Candidate candidate : population) {
-            for (Integer node : candidate.chromosome) {
+            for (Integer node : candidate.getChromosome()) {
                 nodeFrequency.put(node, nodeFrequency.getOrDefault(node, 0) + 1);
             }
         }
