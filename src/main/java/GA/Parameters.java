@@ -25,6 +25,7 @@ public class Parameters {
     public static String fileName = "berlin52.tsp";
     // public static String fileName = "rat783.tsp";
     public static boolean useGraph4j = false;
+    public static boolean useDatabase = true;
 
     public static void setNodesPerVehicle(int nodesPerVehicle) {
         Parameters.nodesPerVehicle = nodesPerVehicle;
@@ -77,9 +78,17 @@ public class Parameters {
     public static void setHyperMutation(boolean hyperMutation) {
         HyperMutation = hyperMutation;
     }
-    // 14 parametrii
+
     public static void setFileName(String fileName) {
         Parameters.fileName = fileName;
+    }
+
+    public static void setUseGraph4j(boolean useGraph4j) {
+        Parameters.useGraph4j = useGraph4j;
+    }
+
+    public static void setUseDatabase(boolean useDatabase) {
+        Parameters.useDatabase = useDatabase;
     }
 
     public static double getCrossoverProbability() {

@@ -13,6 +13,7 @@ module org.example.demo {
     requires java.desktop;
     requires graph4j;
     requires annotations;
+    requires java.sql;
     requires jdk.jsobject;
     requires java.net.http;
     requires org.json;
