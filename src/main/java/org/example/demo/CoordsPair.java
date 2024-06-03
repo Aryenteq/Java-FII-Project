@@ -25,6 +25,7 @@ public class CoordsPair {
 
     @Override
     public String toString() {
-        return STR."CoordsPair{lat=\{lat}, lng=\{lng}\{'}'}";
+        //return STR."CoordsPair{lat=\{lat}, lng=\{lng}\{'}'}";
+        return "CoordsPair [lat=" + lat + ", lng=" + lng + "]";
     }
 }

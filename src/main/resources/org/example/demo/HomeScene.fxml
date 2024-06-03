@@ -7,15 +7,14 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-
-   <AnchorPane maxHeight="720.0" maxWidth="1200.0" minHeight="720.0" minWidth="1200.0" prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: #020122;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.SceneController">
+<AnchorPane maxHeight="720.0" maxWidth="1200.0" minHeight="720.0" minWidth="1200.0" prefHeight="720.0" prefWidth="1200.0" style="-fx-background-color: #020122;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.demo.SceneController">
    <children>
       <Button fx:id="SceneController" layoutX="93.0" layoutY="42.0" mnemonicParsing="false" onAction="#switchToModeSelector" prefHeight="150.0" prefWidth="350.0" stylesheets="@style/HomeStage.css" text="Start" AnchorPane.bottomAnchor="330.0" AnchorPane.leftAnchor="10.0">
          <font>
             <Font size="32.0" />
          </font>
       </Button>
-      <Button layoutX="185.0" layoutY="255.0" mnemonicParsing="false" prefHeight="150.0" prefWidth="350.0" stylesheets="@style/HomeStage.css" text="Load Cities" AnchorPane.bottomAnchor="170.0" AnchorPane.leftAnchor="10.0">
+      <Button layoutX="185.0" layoutY="255.0" mnemonicParsing="false" onAction="#switchToLoad" prefHeight="150.0" prefWidth="350.0" stylesheets="@style/HomeStage.css" text="Load Cities" AnchorPane.bottomAnchor="170.0" AnchorPane.leftAnchor="10.0">
          <font>
             <Font size="32.0" />
          </font>

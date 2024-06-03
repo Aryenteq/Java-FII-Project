@@ -13,7 +13,13 @@ module org.example.demo {
     requires java.desktop;
     requires graph4j;
     requires annotations;
+    requires jdk.jsobject;
+    requires java.net.http;
+    requires org.json;
 
     opens org.example.demo to javafx.fxml;
     exports org.example.demo;
+
+
+
 }
