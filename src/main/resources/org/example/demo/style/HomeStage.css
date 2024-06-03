@@ -1,0 +1,29 @@
+@font-face {
+    font-family: 'coolvetica';
+    src: url('./coolveticaRg.otf') format('openyype'),
+}
+
+.button {
+    -fx-background-color: #F4442E;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(three-pass-box, derive(#F4442E, -20%), 0, 0, 3, 3);
+
+    -fx-text-fill: #F2F3AE;
+    -fx-font-family: coolvetica;
+    -fx-font-size: 40;
+    -fx-font-weight: Bolder;
+}
+
+.button:hover {
+    -fx-background-color: derive(#F4442E, -10%);
+    -fx-text-fill: derive(#F2F3AE, -10%);
+}
+
+.button:pressed {
+    -fx-background-color: derive(#F4442E, -20%);
+    -fx-text-fill: derive(#F2F3AE, -20%);
+}
+
+.title {
+    -fx-text-fill: white;
+}

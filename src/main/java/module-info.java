@@ -10,10 +10,17 @@ module org.example.demo {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires java.desktop;
     requires graph4j;
     requires annotations;
     requires java.sql;
+    requires jdk.jsobject;
+    requires java.net.http;
+    requires org.json;
 
     opens org.example.demo to javafx.fxml;
     exports org.example.demo;
+
+
+
 }

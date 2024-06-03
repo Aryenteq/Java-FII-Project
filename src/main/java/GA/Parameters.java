@@ -90,4 +90,62 @@ public class Parameters {
     public static void setUseDatabase(boolean useDatabase) {
         Parameters.useDatabase = useDatabase;
     }
+
+    public static double getCrossoverProbability() {
+        return crossoverProbability;
+    }
+
+    public static double getFinalPathLength() {
+        // NOT WORKING
+        return 0;
+        // return finalPathLength;
+    }
+
+    public static double getHyperMutationProbability() {
+        return hyperMutationProbability;
+    }
+
+    public static double getMutationProbability() {
+        return mutationProbability;
+    }
+
+    public static int getElitism() {
+        return elitism;
+    }
+
+    public static int getGenerations() {
+        return generations;
+    }
+
+    public static int getMaxStagnationUntil2Opt() {
+        return maxStagnationUntil2Opt;
+    }
+
+    public static int getMaxStagnationUntilAdaptiveMutation() {
+        return maxStagnationUntilAdaptiveMutation;
+    }
+
+    public static int getMaxStagnationUntilHyperMutation() {
+        return maxStagnationUntilHyperMutation;
+    }
+
+    public static int getMaxStagnationUntilWisdom() {
+        return maxStagnationUntilWisdom;
+    }
+
+    public static int getNodesPerVehicle() {
+        return nodesPerVehicle;
+    }
+
+    public static int getPopulationSize() {
+        return populationSize;
+    }
+
+    public static boolean isReverseElitism() {
+        return ReverseElitism;
+    }
+
+    public static boolean isHyperMutation() {
+        return HyperMutation;
+    }
 }

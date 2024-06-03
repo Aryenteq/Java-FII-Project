@@ -4,6 +4,7 @@ import Database.LocationDAO;
 import GA.Parameters;
 import GA.VehicleRouting;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,8 +14,8 @@ import org.graph4j.Graph;
 import org.graph4j.GraphBuilder;
 
 public class CustomGraph {
-    private int nodesNumber;
-    private List<List<Double>> distances;
+    public static int nodesNumber;
+    public static List<List<Double>> distances;
     private String name;
     private List<Node> nodeArr;
     private String edgeWeightType;
@@ -121,7 +122,7 @@ public class CustomGraph {
                     ));
                 }
 
-                if (Parameters.useGraph4j) {
+                if(Parameters.useGraph4j) {
                     graph = GraphBuilder.empty()
                             .estimatedNumVertices(nodesNumber)
                             .estimatedAvgDegree(nodesNumber - 1)
@@ -141,9 +142,9 @@ public class CustomGraph {
 
                                 double distance = Math.sqrt(Math.pow(n1.x() - n2.x(), 2) + Math.pow(n1.y() - n2.y(), 2));
 
-                                if (!Parameters.useGraph4j) {
+                                if(!Parameters.useGraph4j) {
                                     distances.get(i).set(j, distance);
-                                } else if (i < j) {
+                                } else if(i < j){
                                     graph.addEdge(i, j, distance);
                                 }
                             }
@@ -156,6 +157,9 @@ public class CustomGraph {
         }
     }
 
+    public List<Node> getNodeArr() {
+        return nodeArr;
+    }
     // If DB is used - temporary (or not) get the distance in km
     // Based on Earths curve
     private double haversineDistance(Node n1, Node n2) {
