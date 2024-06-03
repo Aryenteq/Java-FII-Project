@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LocationDAO {
     private Connection connection;
@@ -52,5 +54,34 @@ public class LocationDAO {
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         return preparedStatement.executeQuery();
     }
-}
 
+    public List<LocationStructure> getUnsolvedLocationsList() throws SQLException {
+        ResultSet resultSet = getUnsolvedLocations();
+        List<LocationStructure> locations = new ArrayList<>();
+
+        while (resultSet.next()) {
+            int id = resultSet.getInt("id");
+            String name = resultSet.getString("name");
+            double lat = resultSet.getDouble("latitude");
+            double lon = resultSet.getDouble("longitude");
+            boolean solved = resultSet.getBoolean("solved");
+
+            LocationStructure locationStructure = new LocationStructure(id, name, lat, lon, solved);
+            locations.add(locationStructure);
+        }
+        return locations;
+    }
+
+    public void markAsSolved(int id) throws SQLException {
+        String query = "UPDATE Locations SET solved = ? WHERE id = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setBoolean(1, true);
+            preparedStatement.setInt(2, id);
+            preparedStatement.executeUpdate();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+}

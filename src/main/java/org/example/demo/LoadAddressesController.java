@@ -1,5 +1,6 @@
 package org.example.demo;
 
+import Database.LocationDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Worker;
@@ -11,6 +12,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
@@ -18,6 +21,7 @@ import javafx.stage.Stage;
 import netscape.javascript.JSObject;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class LoadAddressesController {
     public AnchorPane anchorPane;
@@ -64,13 +68,36 @@ public class LoadAddressesController {
         stage.setScene(scene);
         stage.show();
     }
-
-    public void logZoom(ActionEvent event) throws IOException {
-        System.out.println("zoom");
+    String address;
+    double lat;
+    double lng;
+    public void setTextAreaValue(String text, double lat, double lng) {
+        this.address = text;
+        this.lat = lat;
+        this.lng = lng;
+        addressField.setWrapText(true);
+        addressField.setText(address);
     }
 
-    public void setTextAreaValue(String text) {
-        addressField.setWrapText(true);
-        addressField.setText(text);
+    public void addAddress(ActionEvent event) throws SQLException {
+        LocationDAO locationDB = new LocationDAO();
+        if(address != null && !address.isEmpty())
+            locationDB.addLocation(address, lat, lng, false);
+    }
+
+    public void tryGetCoords(KeyEvent keyEvent) {
+        if(keyEvent.getCode() == KeyCode.ENTER) {
+            CoordsPair coords = null;
+            try{
+                coords = controller.getAddress(addressField.getText());
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+            }
+            webEngine.executeScript("moveTo(" + coords.getLat() + "," + coords.getLng() + ")");
+            address = addressField.getText().substring(0,addressField.getText().length()-1);
+            lat = coords.getLat();
+            lng = coords.getLng();
+        }
     }
 }

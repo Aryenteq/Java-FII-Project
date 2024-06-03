@@ -33,10 +33,10 @@ public class HelloApplication extends Application {
         try {
             LocationDAO locationDAO = new LocationDAO();
 
-            //launch();
-            GA.Parameters.setGenerations(1000);
-            VehicleRouting solver = new VehicleRouting();
-            solver.run();
+            launch();
+//            GA.Parameters.setGenerations(1000);
+//            VehicleRouting solver = new VehicleRouting();
+//            solver.run();
 
             // Add/update solver/delete
             //locationDAO.addLocation("Sample Location", 37.7749, -122.4194, false);

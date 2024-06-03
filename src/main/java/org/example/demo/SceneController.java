@@ -9,10 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -20,6 +17,7 @@ import java.io.IOException;
 
 public class SceneController {
 
+    public ProgressBar progressBar;
     @FXML
     CheckBox reverseElitism;
     @FXML
@@ -75,6 +73,14 @@ public class SceneController {
 
     public void switchToLoad(ActionEvent event) throws IOException {
         root = FXMLLoader.load(getClass().getResource("LoadAddresses.fxml"));
+        stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public void switchToSelect(ActionEvent event) throws IOException {
+        root = FXMLLoader.load(getClass().getResource("SelectAddresses.fxml"));
         stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         scene = new Scene(root);
         stage.setScene(scene);

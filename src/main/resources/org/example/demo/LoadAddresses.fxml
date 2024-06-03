@@ -17,9 +17,9 @@
             </padding>
          <children>
             <ComboBox id="inputField" fx:id="selectType" prefWidth="280.0" promptText="Select input type" stylesheets="@style/LoadAddresses.css" />
-            <TextArea fx:id="addressField" editable="false" prefHeight="83.0" prefWidth="260.0" styleClass="inputField" stylesheets="@style/LoadAddresses.css" />
+            <TextArea fx:id="addressField" editable="false" onKeyPressed="#tryGetCoords" prefHeight="83.0" prefWidth="260.0" styleClass="inputField" stylesheets="@style/LoadAddresses.css" />
             <Button mnemonicParsing="false" onAction="#switchToHome" prefWidth="280.0" styleClass="actionButton" stylesheets="@style/LoadAddresses.css" text="Back" />
-            <Button mnemonicParsing="false" prefWidth="280.0" styleClass="actionButton" stylesheets="@style/LoadAddresses.css" text="Add " />
+            <Button mnemonicParsing="false" onAction="#addAddress" prefWidth="280.0" styleClass="actionButton" stylesheets="@style/LoadAddresses.css" text="Add " />
          </children>
         </VBox>
     </children>

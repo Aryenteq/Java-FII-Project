@@ -15,7 +15,7 @@
                          <Font size="32.0" />
                      </font>
                  </Button>
-                 <Button mnemonicParsing="false" prefHeight="150.0" prefWidth="500.0" stylesheets="@style/HomeStage.css" text="Map">
+                 <Button mnemonicParsing="false" onAction="#switchToSelect" prefHeight="150.0" prefWidth="500.0" stylesheets="@style/HomeStage.css" text="Map">
                      <font>
                          <Font size="32.0" />
                      </font>
