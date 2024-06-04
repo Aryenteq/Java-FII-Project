@@ -39,9 +39,17 @@
             addRoute(route.geometry);
         });
     }
+    var routes = []
     function addRoute(geometry) {
-        var route = L.geoJSON(JSON.parse(geometry)).addTo(map);
-        map.fitBounds(route.getBounds());
+        var routeLayer = mapLib.geoJSON(JSON.parse(geometry)).addTo(map);
+        routes.push(routeLayer)
+        // map.fitBounds(route.getBounds());
+    }
+    function removeRoutes() {
+        routes.forEach(routeLayer => {
+            map.removeLayer(routeLayer);
+        });
+        routes = []
     }
 </script>
 </body>

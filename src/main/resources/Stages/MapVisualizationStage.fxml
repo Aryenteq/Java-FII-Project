@@ -13,27 +13,27 @@
       <VBox layoutX="20.0" layoutY="624.0" prefWidth="200.0" spacing="20.0" styleClass="menu" stylesheets="@style/ClassicStage.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Button mnemonicParsing="false" onAction="#switchToModeSelector" prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="Back" />
-            <Button mnemonicParsing="false" prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="Run" />
+            <Button mnemonicParsing="false" onAction="#run" prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="Run" />
             <Button mnemonicParsing="false" onAction="#markAsSolved" prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="Mark solved" />
             <Line endX="160.0" styleClass="hLine" />
             <VBox prefWidth="100.0" spacing="5.0">
                <children>
                   <Label prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="Generation" textAlignment="CENTER" />
-                  <Label prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="0000" textAlignment="CENTER" />
+                  <Label fx:id="currentGenerations" prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="0000" textAlignment="CENTER" />
                </children>
             </VBox>
             <Line endX="160.0" styleClass="hLine" />
             <VBox prefWidth="100.0" spacing="5.0">
                <children>
                   <Label prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="Best path" textAlignment="CENTER" />
-                  <Label prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="0000" textAlignment="CENTER" />
+                  <Label fx:id="bestPath" prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="0000" textAlignment="CENTER" />
                </children>
             </VBox>
             <Line endX="160.0" styleClass="hLine" />
             <VBox prefWidth="100.0" spacing="5.0">
                <children>
                   <Label prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="Current best" textAlignment="CENTER" />
-                  <Label prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="0000" textAlignment="CENTER" />
+                  <Label fx:id="currentPath" prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="0000" textAlignment="CENTER" />
                </children>
             </VBox>
             <Line endX="160.0" styleClass="hLine" />

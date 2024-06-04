@@ -63,7 +63,7 @@ public class ParametersController {
             reverseElitism.setSelected(true);
         if (Parameters.isHyperMutation())
             hyperMutatiion.setSelected(true);
-        if(Parameters.useGraph4j)
+        if(Parameters.isUseGraph4j())
             graph4J.setSelected(true);
 
         mutationRate.setText(String.valueOf(Parameters.getMutationProbability()));
@@ -100,7 +100,7 @@ public class ParametersController {
             reverseElitism.setSelected(true);
         if (Parameters.isHyperMutation())
             hyperMutatiion.setSelected(true);
-        if(Parameters.useGraph4j)
+        if(Parameters.isUseGraph4j())
             graph4J.setSelected(true);
     }
 
@@ -133,22 +133,22 @@ public class ParametersController {
     }
 
     public void setParameters(ActionEvent event) throws IOException {
-            Parameters.setReverseElitism(reverseElitism.isSelected());
-            Parameters.setHyperMutation(hyperMutatiion.isSelected());
-            Parameters.setGenerations(Integer.parseInt(maxGenerations.getText()) );
-            Parameters.setNodesPerVehicle(Integer.parseInt(maxNodes.getText()) );
-            Parameters.setPopulationSize(Integer.parseInt(maxPopulation.getText()) );
-            Parameters.setUseGraph4j(graph4J.isSelected());
+        Parameters.setReverseElitism(reverseElitism.isSelected());
+        Parameters.setHyperMutation(hyperMutatiion.isSelected());
+        Parameters.setGenerations(Integer.parseInt(maxGenerations.getText()) );
+        Parameters.setNodesPerVehicle(Integer.parseInt(maxNodes.getText()) );
+        Parameters.setPopulationSize(Integer.parseInt(maxPopulation.getText()) );
+        Parameters.setUseGraph4j(graph4J.isSelected());
 
-            Parameters.setMutationProbability(Double.parseDouble(mutationRate.getText()));
-            Parameters.setHyperMutationProbability(Double.parseDouble(hyperMutationRate.getText()));
-            Parameters.setCrossoverProbability(Double.parseDouble(crosoverRate.getText()));
-            Parameters.setElitism(Integer.parseInt(elitismRate.getText()));
+        Parameters.setMutationProbability(Double.parseDouble(mutationRate.getText()));
+        Parameters.setHyperMutationProbability(Double.parseDouble(hyperMutationRate.getText()));
+        Parameters.setCrossoverProbability(Double.parseDouble(crosoverRate.getText()));
+        Parameters.setElitism(Integer.parseInt(elitismRate.getText()));
 
-            Parameters.setMaxStagnationUntil2Opt(Integer.parseInt(opt2Gen.getText()));
-            Parameters.setMaxStagnationUntilWisdom(Integer.parseInt(wisdomGen.getText()));
-            Parameters.setMaxStagnationUntilAdaptiveMutation(Integer.parseInt(mutationGen.getText()));
-            Parameters.setMaxStagnationUntilHyperMutation(Integer.parseInt(hyperMutationGen.getText()));
+        Parameters.setMaxStagnationUntil2Opt(Integer.parseInt(opt2Gen.getText()));
+        Parameters.setMaxStagnationUntilWisdom(Integer.parseInt(wisdomGen.getText()));
+        Parameters.setMaxStagnationUntilAdaptiveMutation(Integer.parseInt(mutationGen.getText()));
+        Parameters.setMaxStagnationUntilHyperMutation(Integer.parseInt(hyperMutationGen.getText()));
     }
 
 }

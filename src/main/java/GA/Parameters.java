@@ -1,161 +1,216 @@
 package GA;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parameters {
-    public static int nodesPerVehicle = 10;
-    public static double avgPathLength = Double.MAX_VALUE;
-    public static String fileName = "berlin52.tsp";
-    // public static String fileName = "rat783.tsp";
-    public static boolean useGraph4j = false;
-    public static boolean useDatabase = true;
-    static double bestPathLength = Double.MAX_VALUE;
-    static boolean bestPathChanged = false;
-    static List<Integer> bestPath;
-    static int populationSize = 300;
-    static int generations = 1000;
-    static double mutationProbability = 0.001;
-    static double hyperMutationProbability = 0.1;
-    static double crossoverProbability = 0.8;
-    static int maxStagnationUntilAdaptiveMutation = 30;
-    static int maxStagnationUntilHyperMutation = 50;
-    static int maxStagnationUntilWisdom = 80;
-    static int maxStagnationUntil2Opt = 100;
-    static int elitism = 5 * populationSize / 100;
-    static boolean ReverseElitism = false;
-    static boolean HyperMutation = false;
+    private static double avgPathLength = Double.MAX_VALUE;
+    private static int nodesPerVehicle = 10;
+    private static String fileName = "berlin52.tsp";
+    private static boolean useGraph4j = false;
+    private static boolean useDatabase = false;
+    private static double bestPathLength = Double.MAX_VALUE;
+    private static boolean bestPathChanged = false;
+    private static List<Integer> bestPath = new ArrayList<Integer>();
+    private static int populationSize = 300;
+    private static int generations = 1000;
+    private static int currentGeneration = 0;
+    private static double mutationProbability = 0.001;
+    private static double hyperMutationProbability = 0.1;
+    private static double crossoverProbability = 0.8;
+    private static int maxStagnationUntilAdaptiveMutation = 30;
+    private static int maxStagnationUntilHyperMutation = 50;
+    private static int maxStagnationUntilWisdom = 80;
+    private static int maxStagnationUntil2Opt = 100;
+    private static int elitism = 5 * populationSize / 100;
+    private static boolean ReverseElitism = false;
+    private static boolean HyperMutation = false;
+    private static boolean done = false;
 
-    public static boolean isBestPathChanged() {
-        return bestPathChanged;
+    public static synchronized void reset()
+    {
+        done = false;
+        currentGeneration = 0;
+        bestPath = new ArrayList<>();
+        bestPathChanged = true;
+        bestPathLength = Double.MAX_VALUE;
+
     }
 
-    public static void setBestPathChanged(boolean bestPathChanged) {
-        Parameters.bestPathChanged = bestPathChanged;
+    public static synchronized double getAvgPathLength() {
+        return avgPathLength;
     }
 
-    public static List<Integer> getBestPath() {
-        return bestPath;
+    public static synchronized void setAvgPathLength(double avgPathLength) {
+        Parameters.avgPathLength = avgPathLength;
     }
 
-    public static void setFileName(String fileName) {
+    public static synchronized double getBestPathLength() {
+        return bestPathLength;
+    }
+
+    public static synchronized void setBestPathLength(double bestPathLength) {
+        Parameters.bestPathLength = bestPathLength;
+    }
+
+    public static synchronized int getCurrentGeneration() {
+        return currentGeneration;
+    }
+
+    public static synchronized void setCurrentGeneration(int currentGeneration) {
+        Parameters.currentGeneration = currentGeneration;
+    }
+
+    public static synchronized String getFileName() {
+        return fileName;
+    }
+
+    public static synchronized void setFileName(String fileName) {
         Parameters.fileName = fileName;
     }
 
-    public static void setUseGraph4j(boolean useGraph4j) {
+    public static synchronized boolean isUseGraph4j() {
+        return useGraph4j;
+    }
+
+    public static synchronized void setUseGraph4j(boolean useGraph4j) {
         Parameters.useGraph4j = useGraph4j;
     }
 
-    public static void setUseDatabase(boolean useDatabase) {
+    public static synchronized boolean isUseDatabase() {
+        return useDatabase;
+    }
+
+    public static synchronized void setUseDatabase(boolean useDatabase) {
         Parameters.useDatabase = useDatabase;
     }
 
-    public static double getCrossoverProbability() {
+    public static synchronized boolean isDone() {
+        return done;
+    }
+
+    public static synchronized void setDone(boolean done) {
+        Parameters.done = done;
+    }
+
+    public static synchronized boolean isBestPathChanged() {
+        return bestPathChanged;
+    }
+
+    public static synchronized void setBestPathChanged(boolean bestPathChanged) {
+        Parameters.bestPathChanged = bestPathChanged;
+    }
+
+    public static synchronized List<Integer> getBestPath() {
+        return bestPath;
+    }
+
+    public static synchronized void setBestPath(List<Integer> bestPath) {
+        Parameters.bestPath = bestPath;
+    }
+
+    public static synchronized double getCrossoverProbability() {
         return crossoverProbability;
     }
 
-    public static void setCrossoverProbability(double crossoverProbability) {
+    public static synchronized void setCrossoverProbability(double crossoverProbability) {
         Parameters.crossoverProbability = crossoverProbability;
     }
 
-    public static double getFinalPathLength() {
-        // NOT WORKING
-        return 0;
-        // return finalPathLength;
-    }
 
-    public static double getHyperMutationProbability() {
+    public static synchronized double getHyperMutationProbability() {
         return hyperMutationProbability;
     }
 
-    public static void setHyperMutationProbability(double hyperMutationProbability) {
+    public static synchronized void setHyperMutationProbability(double hyperMutationProbability) {
         Parameters.hyperMutationProbability = hyperMutationProbability;
     }
 
-    public static double getMutationProbability() {
+    public static synchronized double getMutationProbability() {
         return mutationProbability;
     }
 
-    public static void setMutationProbability(double mutationProbability) {
+    public static synchronized void setMutationProbability(double mutationProbability) {
         Parameters.mutationProbability = mutationProbability;
     }
 
-    public static int getElitism() {
+    public static synchronized int getElitism() {
         return elitism;
     }
 
-    public static void setElitism(int elitism) {
+    public static synchronized void setElitism(int elitism) {
         Parameters.elitism = elitism;
     }
 
-    public static int getGenerations() {
+    public static synchronized int getGenerations() {
         return generations;
     }
 
-    public static void setGenerations(int generations) {
+    public static synchronized void setGenerations(int generations) {
         Parameters.generations = generations;
     }
 
-    public static int getMaxStagnationUntil2Opt() {
+    public static synchronized int getMaxStagnationUntil2Opt() {
         return maxStagnationUntil2Opt;
     }
 
-    public static void setMaxStagnationUntil2Opt(int maxStagnationUntil2Opt) {
+    public static synchronized void setMaxStagnationUntil2Opt(int maxStagnationUntil2Opt) {
         Parameters.maxStagnationUntil2Opt = maxStagnationUntil2Opt;
     }
 
-    public static int getMaxStagnationUntilAdaptiveMutation() {
+    public static synchronized int getMaxStagnationUntilAdaptiveMutation() {
         return maxStagnationUntilAdaptiveMutation;
     }
 
-    public static void setMaxStagnationUntilAdaptiveMutation(int maxStagnationUntilAdaptiveMutation) {
+    public static synchronized void setMaxStagnationUntilAdaptiveMutation(int maxStagnationUntilAdaptiveMutation) {
         Parameters.maxStagnationUntilAdaptiveMutation = maxStagnationUntilAdaptiveMutation;
     }
 
-    public static int getMaxStagnationUntilHyperMutation() {
+    public static synchronized int getMaxStagnationUntilHyperMutation() {
         return maxStagnationUntilHyperMutation;
     }
 
-    public static void setMaxStagnationUntilHyperMutation(int maxStagnationUntilHyperMutation) {
+    public static synchronized void setMaxStagnationUntilHyperMutation(int maxStagnationUntilHyperMutation) {
         Parameters.maxStagnationUntilHyperMutation = maxStagnationUntilHyperMutation;
     }
 
-    public static int getMaxStagnationUntilWisdom() {
+    public static synchronized int getMaxStagnationUntilWisdom() {
         return maxStagnationUntilWisdom;
     }
 
-    public static void setMaxStagnationUntilWisdom(int maxStagnationUntilWisdom) {
+    public static synchronized void setMaxStagnationUntilWisdom(int maxStagnationUntilWisdom) {
         Parameters.maxStagnationUntilWisdom = maxStagnationUntilWisdom;
     }
 
-    public static int getNodesPerVehicle() {
+    public static synchronized int getNodesPerVehicle() {
         return nodesPerVehicle;
     }
 
-    public static void setNodesPerVehicle(int nodesPerVehicle) {
+    public static synchronized void setNodesPerVehicle(int nodesPerVehicle) {
         Parameters.nodesPerVehicle = nodesPerVehicle;
     }
 
-    public static int getPopulationSize() {
+    public static synchronized int getPopulationSize() {
         return populationSize;
     }
 
-    public static void setPopulationSize(int populationSize) {
+    public static synchronized void setPopulationSize(int populationSize) {
         Parameters.populationSize = populationSize;
     }
 
-    public static boolean isReverseElitism() {
+    public static synchronized boolean isReverseElitism() {
         return ReverseElitism;
     }
 
-    public static void setReverseElitism(boolean reverseElitism) {
+    public static synchronized void setReverseElitism(boolean reverseElitism) {
         ReverseElitism = reverseElitism;
     }
 
-    public static boolean isHyperMutation() {
+    public static synchronized boolean isHyperMutation() {
         return HyperMutation;
     }
 
-    public static void setHyperMutation(boolean hyperMutation) {
+    public static synchronized void setHyperMutation(boolean hyperMutation) {
         HyperMutation = hyperMutation;
     }
 }

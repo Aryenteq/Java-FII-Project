@@ -81,6 +81,5 @@ public class LocationDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }
