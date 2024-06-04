@@ -1,6 +1,8 @@
 package Data;
 
+import Controllers.MapVisualizationController;
 import Database.LocationDAO;
+import Database.LocationStructure;
 import GA.Parameters;
 import GA.VehicleRouting;
 import org.graph4j.Graph;
@@ -20,7 +22,7 @@ public class CustomGraph {
     private Graph graph;
 
     public CustomGraph() {
-        if (Parameters.useDatabase) {
+        if (Parameters.isUseDatabase()) {
             initializeGraphFromDB();
         } else {
             initializeGraphFromFile();
@@ -28,28 +30,33 @@ public class CustomGraph {
     }
 
     private void initializeGraphFromDB() {
-        try {
-            LocationDAO locationDAO = new LocationDAO();
+//        try {
+//            LocationDAO locationDAO = new LocationDAO();
             name = "Database";
             nodeArr = new ArrayList<>();
-            ResultSet resultSet = locationDAO.getUnsolvedLocations();
-
+//            ResultSet resultSet = locationDAO.getSelectedLocations();
+            List<LocationStructure> locationsData = MapVisualizationController.locations;
             int index = 0;
-            while (resultSet.next()) {
-                double latitude = resultSet.getDouble("latitude");
-                double longitude = resultSet.getDouble("longitude");
-                nodeArr.add(new Node(index, (float) latitude, (float) longitude));
+            for(LocationStructure location : locationsData) {
+                nodeArr.add(new Node(index, (float) location.getLatitude(), (float) location.getLongitude()));
                 index++;
             }
+//            int index = 0;
+//            while (resultSet.next()) {
+//                double latitude = resultSet.getDouble("latitude");
+//                double longitude = resultSet.getDouble("longitude");
+//                nodeArr.add(new Node(index, (float) latitude, (float) longitude));
+//                index++;
+//            }
             nodesNumber = nodeArr.size();
 
-            if (!Parameters.useGraph4j) {
+            if (!Parameters.isUseGraph4j()) {
                 distances = new ArrayList<>(nodesNumber);
                 for (int i = 0; i < nodesNumber; i++)
                     distances.add(new ArrayList<>(Collections.nCopies(nodesNumber, 0.0)));
             }
 
-            if (Parameters.useGraph4j) {
+            if (Parameters.isUseGraph4j()) {
                 graph = GraphBuilder.empty().estimatedNumVertices(nodesNumber).estimatedAvgDegree(nodesNumber - 1).buildGraph();
                 for (int i = 0; i < nodesNumber; i++) {
                     graph.addVertex(i);
@@ -65,7 +72,7 @@ public class CustomGraph {
 
                         double distance = haversineDistance(n1, n2);
 
-                        if (!Parameters.useGraph4j) {
+                        if (!Parameters.isUseGraph4j()) {
                             distances.get(i).set(j, distance);
                         } else if (i < j) {
                             graph.addEdge(i, j, distance);
@@ -74,13 +81,13 @@ public class CustomGraph {
                 }
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private void initializeGraphFromFile() {
-        String filePath = "/Routes/" + Parameters.fileName;
+        String filePath = "/Routes/" + Parameters.getFileName();
         try (InputStream inputStream = VehicleRouting.class.getResourceAsStream(filePath)) {
             if (inputStream == null) {
                 throw new IllegalArgumentException("File not found: " + filePath);
@@ -93,7 +100,7 @@ public class CustomGraph {
                     } else if (line.contains("DIMENSION")) {
                         nodesNumber = Integer.parseInt(line.split(":")[1].trim());
                         nodeArr = new ArrayList<>(nodesNumber);
-                        if (!Parameters.useGraph4j) {
+                        if (!Parameters.isUseGraph4j()) {
                             distances = new ArrayList<>(nodesNumber);
                             for (int i = 0; i < nodesNumber; i++)
                                 distances.add(new ArrayList<>(Collections.nCopies(nodesNumber, 0.0)));
@@ -114,7 +121,7 @@ public class CustomGraph {
                     nodeArr.add(new Node(i, Float.parseFloat(tokens[1]), Float.parseFloat(tokens[2])));
                 }
 
-                if (Parameters.useGraph4j) {
+                if (Parameters.isUseGraph4j()) {
                     graph = GraphBuilder.empty().estimatedNumVertices(nodesNumber).estimatedAvgDegree(nodesNumber - 1).buildGraph();
                     for (int i = 0; i < nodesNumber; i++) {
                         graph.addVertex(i);
@@ -131,7 +138,7 @@ public class CustomGraph {
 
                                 double distance = Math.sqrt(Math.pow(n1.x() - n2.x(), 2) + Math.pow(n1.y() - n2.y(), 2));
 
-                                if (!Parameters.useGraph4j) {
+                                if (!Parameters.isUseGraph4j()) {
                                     distances.get(i).set(j, distance);
                                 } else if (i < j) {
                                     graph.addEdge(i, j, distance);

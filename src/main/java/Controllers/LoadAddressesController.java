@@ -82,8 +82,10 @@ public class LoadAddressesController {
 
     public void addAddress(ActionEvent event) throws SQLException {
         LocationDAO locationDB = new LocationDAO();
-        address = address.replaceAll("\n", " ");
-        if (address != null && !address.isEmpty()) locationDB.addLocation(address, lat, lng, false);
+        if (address != null && !address.isEmpty()) {
+            address = address.replaceAll("\n", " ");
+            locationDB.addLocation(address, lat, lng, false);
+        }
     }
 
     public void tryGetCoords(KeyEvent keyEvent) {

@@ -18,6 +18,7 @@ public class Candidate implements Comparable<Candidate> {
     private final List<Integer> chromosome;
     private double fitness;
 
+
     // Used in the crossover for example
     public Candidate(List<Integer> order, CustomGraph graph) {
         this.graph = graph;
@@ -76,7 +77,7 @@ public class Candidate implements Comparable<Candidate> {
         List<Integer> normalizedChromosome = getNormalizedChromosome();
 
         // Get the distances based on the type of data structure used (custom graph || graph4j)
-        if (!Parameters.useGraph4j) {
+        if (!Parameters.isUseGraph4j()) {
             for (int i = 0; i < normalizedChromosome.size() - 1; i++) {
                 result += graph.getDistances().get(normalizedChromosome.get(i)).get(normalizedChromosome.get(i + 1));
             }
@@ -87,11 +88,12 @@ public class Candidate implements Comparable<Candidate> {
         }
 
         this.pathLength = result;
-
-        if (result < Parameters.bestPathLength) {
-            Parameters.bestPathLength = result;
-            Parameters.bestPath = new ArrayList<>(normalizedChromosome);
-            Parameters.bestPathChanged = true;
+        if (result < Parameters.getBestPathLength()) {
+            Parameters.setBestPathLength(result);
+            Parameters.setBestPath(normalizedChromosome);
+            Parameters.setBestPathChanged(true);
+//            Parameters.bestPath = new ArrayList<>(normalizedChromosome);
+//            Parameters.bestPathChanged = true;
         }
 
         this.fitness = 1 / result;
@@ -101,7 +103,7 @@ public class Candidate implements Comparable<Candidate> {
     private List<Integer> getNormalizedChromosome() {
         List<Integer> normalizedChromosome = new ArrayList<>(chromosome);
         int insertions = 0;
-        for (int i = 0; i <= chromosome.size(); i += Parameters.nodesPerVehicle) {
+        for (int i = 0; i <= chromosome.size(); i += Parameters.getNodesPerVehicle()) {
             if (insertions == 0) {
                 normalizedChromosome.add(i + insertions, 0);
                 i++;
@@ -166,7 +168,7 @@ public class Candidate implements Comparable<Candidate> {
         int c = chromosome.get(j);
         int d = chromosome.get((j + 1) % chromosome.size());
 
-        if (!Parameters.useGraph4j) {
+        if (!Parameters.isUseGraph4j()) {
             // Custom graph
             return graph.getDistances().get(a).get(c) + graph.getDistances().get(b).get(d) - (graph.getDistances().get(a).get(b) + graph.getDistances().get(c).get(d));
         } else {

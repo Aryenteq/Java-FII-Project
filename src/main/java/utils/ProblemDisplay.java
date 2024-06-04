@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.nio.file.FileSystems;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,10 +29,11 @@ public class ProblemDisplay {
     static double circleRadius;
 
     static String fileSeparator = Objects.equals(FileSystems.getDefault().getSeparator(), "\\") ? "\\\\" : File.separator;
+    static String resource;
 
+    public static boolean instanceSelected = false;
 
     public static void drawInstance(Parent root, Stage stage) {
-
         maxX = Double.MIN_VALUE;
         maxY = Double.MIN_VALUE;
         minX = Double.MAX_VALUE;
@@ -41,10 +41,11 @@ public class ProblemDisplay {
 
         AnchorPane anchorPane = (AnchorPane) root;
         drawingScene = (AnchorPane) anchorPane.getChildren().get(1);
-
+        drawingScene.getChildren().clear();
         String pathToSet = SetSelector.selectSet(stage);
-        pathToSet = pathToSet.split(fileSeparator)[pathToSet.split(fileSeparator).length - 1];
-        coords = SetSelector.parse(pathToSet);
+        if(pathToSet == null) return;
+        resource = pathToSet.split(fileSeparator)[pathToSet.split(fileSeparator).length - 1];
+        coords = SetSelector.parse(resource);
 
         circleRadius = 3;
         drawingSceneWidth = drawingScene.getWidth() - 4 * circleRadius;
@@ -60,7 +61,6 @@ public class ProblemDisplay {
             if (maxX < coordsPair.getLat()) maxX = coordsPair.getLat();
             if (maxY < coordsPair.getLng()) maxY = coordsPair.getLng();
         }
-        List<Integer> temp = new ArrayList<>();
         for (CoordsPair coordsPair : coords) {
             double x = coordsPair.getLat() / maxX * (drawingSceneWidth - 2 * circleRadius) + 4 * circleRadius;
             double y = coordsPair.getLng() / maxY * (drawingSceneHeight - 2 * circleRadius) + 4 * circleRadius;
@@ -72,17 +72,24 @@ public class ProblemDisplay {
 
             drawingScene.getChildren().add(dot);
         }
-        for (int i = 0; i < coords.size(); i++) {
-            temp.add(i);
-        }
-        temp = Parameters.getBestPath();
-        drawSolution(temp);
+        instanceSelected = true;
     }
 
     public static void drawSolution(List<Integer> order) {
-        for (int i = 1; i < order.size(); i++) {
-            CoordsPair first = coords.get(order.get(i - 1));
-            CoordsPair second = coords.get(order.get(i));
+
+        drawingScene.getChildren().removeIf(node -> node instanceof Line);
+
+
+        for (int i = 0; i < order.size(); i++) {
+            CoordsPair first;
+            CoordsPair second;
+            if (i == 0) {
+                first = coords.get(order.getFirst());
+                second = coords.get(order.getLast());
+            } else {
+                first = coords.get(order.get(i - 1));
+                second = coords.get(order.get(i));
+            }
 
             double c1X = first.getLat() / maxX * (drawingSceneWidth - 2 * circleRadius) + 4 * circleRadius;
             double c1Y = first.getLng() / maxY * (drawingSceneHeight - 2 * circleRadius) + 4 * circleRadius;
@@ -96,5 +103,10 @@ public class ProblemDisplay {
 
             drawingScene.getChildren().add(line);
         }
+
+    }
+
+    public static void reset() {
+        drawingScene.getChildren().clear();
     }
 }

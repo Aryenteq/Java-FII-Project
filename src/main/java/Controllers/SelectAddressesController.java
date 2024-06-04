@@ -43,6 +43,7 @@ public class SelectAddressesController {
 
     @FXML
     public void initialize() throws SQLException {
+        MapRoutes.reset();
         locationDAO = new LocationDAO();
         webEngine = webView.getEngine();
         webEngine.load(StageResources.getResource("Maps/Select.html").toExternalForm());
@@ -126,7 +127,7 @@ public class SelectAddressesController {
         for (LocationStructure location : locations) {
             if (location.getId() == id) {
                 webEngine.executeScript(STR."addMarkerToMap(\{location.getLatitude()}, \{location.getLongitude()}, '\{location.getName()}', \{location.getId()})");
-                selectedLocations.add(location);
+                selectedLocations.remove(location);
                 break;
             }
         }

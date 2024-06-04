@@ -36,7 +36,6 @@ public class LoadingRoutesController {
         new Thread(routes).start();
         progressBar.progressProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.doubleValue() >= 1.0) {
-
                 doneButton.setDisable(false);
                 doneButton.setOpacity(1.0);
             }

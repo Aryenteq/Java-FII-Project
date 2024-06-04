@@ -13,17 +13,20 @@ public class VehicleRouting {
     }
 
     private void GA(CustomGraph graph) {
-        Parameters.bestPath = new ArrayList<>();
+        //Parameters.setBestPath(new ArrayList<>());
         int noChange = 0;
-        List<Candidate> population = new ArrayList<>(Parameters.populationSize);
-        for (int i = 0; i < Parameters.populationSize; i++) {
-            population.add(new Candidate(graph));
+        List<Candidate> population = new ArrayList<>(Parameters.getPopulationSize());
+        for (int i = 0; i < Parameters.getPopulationSize(); i++) {
+            Candidate candidate = new Candidate(graph);
+            population.add(candidate);
         }
 
-        double mutationRate = Parameters.mutationProbability;
+        double mutationRate = Parameters.getMutationProbability();
+        for (int i = 0; i < Parameters.getGenerations(); i++) {
+            // System.out.println("Generation " + i);
 
-        for (int i = 0; i < Parameters.generations; i++) {
-            double oldFinalPathLength = Parameters.bestPathLength;
+            Parameters.setCurrentGeneration(i);
+            double oldFinalPathLength = Parameters.getBestPathLength();
 
             // Selection
             selection(population);
@@ -34,27 +37,27 @@ public class VehicleRouting {
             }
 
             // Conditional Local Search
-            if (noChange > Parameters.maxStagnationUntil2Opt) {
+            if (noChange > Parameters.getMaxStagnationUntil2Opt()) {
                 for (Candidate candidate : population) {
                     candidate.localSearch();
                 }
             }
 
             // HyperMutation
-            if (Parameters.HyperMutation) {
-                if (noChange > Parameters.maxStagnationUntilHyperMutation) {
+            if (Parameters.isHyperMutation()) {
+                if (noChange > Parameters.getMaxStagnationUntilHyperMutation()) {
                     for (Candidate individual : population) {
-                        individual.mutate(Parameters.hyperMutationProbability);
+                        individual.mutate(Parameters.getHyperMutationProbability());
                     }
                 }
             }
 
             // Crossover
             Collections.sort(population);
-            for (int j = 0; j < Parameters.populationSize - 1; j += 2) {
+            for (int j = 0; j < Parameters.getPopulationSize() - 1; j += 2) {
                 double probability = Math.random();
-                if (probability < Parameters.crossoverProbability) {
-                    if (j < Parameters.populationSize - 1) {
+                if (probability < Parameters.getCrossoverProbability()) {
+                    if (j < Parameters.getPopulationSize() - 1) {
                         population.set(j, Candidate.crossoverPMX(population.get(j), population.get(j + 1), graph));
                     }
                 }
@@ -63,29 +66,30 @@ public class VehicleRouting {
             Collections.sort(population);
 
             // Last five percent will be reset
-            if (Parameters.ReverseElitism) {
-                for (int j = 0; j < Parameters.elitism; j++) {
-                    population.set(j, new Candidate(graph));
+            if (Parameters.isReverseElitism()) {
+                for (int j = 0; j < Parameters.getElitism(); j++) {
+                    Candidate candidate = new Candidate(graph);
+                    population.set(j, candidate);
                 }
             }
 
             // Wisdom
-            if (Parameters.bestPathLength == oldFinalPathLength) {
+            if (Parameters.getBestPathLength() == oldFinalPathLength) {
                 noChange++;
-                if (noChange > Parameters.maxStagnationUntilWisdom) {
+                if (noChange > Parameters.getMaxStagnationUntilWisdom()) {
                     List<Integer> consensusPath = wisdomOfCrowds(population);
-                    int numConsensus = Parameters.populationSize / 10;
+                    int numConsensus = Parameters.getPopulationSize() / 10;
                     for (int j = 0; j < numConsensus; j++) {
                         population.set(j, new Candidate(consensusPath, graph));
                     }
                 }
             } else {
                 noChange = 0;
-                mutationRate = Parameters.mutationProbability; // Reset when improved
+                mutationRate = Parameters.getMutationProbability(); // Reset when improved
             }
 
             // Adaptive Mutation Rate
-            if (noChange > Parameters.maxStagnationUntilAdaptiveMutation) {
+            if (noChange > Parameters.getMaxStagnationUntilAdaptiveMutation()) {
                 mutationRate *= 1.05; // Increase mutation rate
             }
 
@@ -93,17 +97,17 @@ public class VehicleRouting {
             for (Candidate individual : population) {
                 result += individual.getPathLength();
             }
-            Parameters.avgPathLength = result / population.size();
-
-//            System.out.println("Generation " + i + " of " + Parameters.generations);
-//            System.out.print(Parameters.bestPathLength + " ");
+            Parameters.setAvgPathLength(result/ population.size());
+//            System.out.println("Generation " + i + " of " + Parameters.getGenerations());
+//            System.out.print(Parameters.getBestPathLength() + " ");
 //            showBestPath();
-//            System.out.println("Average path length: " + Parameters.avgPathLength);
+//            System.out.println("Average path length: " + Parameters.getAvgPathLength());
 //            System.out.println();
         }
 
         // Finish
         System.out.println("Algorithm completed.");
+        Parameters.setDone(true);
     }
 
 
@@ -111,7 +115,7 @@ public class VehicleRouting {
         List<Candidate> newPopulation = new ArrayList<>();
 
         population.sort(Comparator.reverseOrder());
-        for (int i = Parameters.populationSize - 1; i >= Parameters.populationSize - 1 - Parameters.elitism; i--) {
+        for (int i = Parameters.getPopulationSize() - 1; i >= Parameters.getPopulationSize() - 1 - Parameters.getElitism(); i--) {
             newPopulation.add(population.get(i));
             population.remove(i);
         }
@@ -127,12 +131,12 @@ public class VehicleRouting {
             q.add(q.get(i) + prob.get(i));
         }
 
-        int helperToMaintainPopSize = Parameters.elitism;
+        int helperToMaintainPopSize = Parameters.getElitism();
 
         Random random = new Random();
 
         // Binary search doesn't get the same results as this, idk why
-        for (int i = 0; i < Parameters.populationSize - 1 - helperToMaintainPopSize; i++) {
+        for (int i = 0; i < Parameters.getPopulationSize() - 1 - helperToMaintainPopSize; i++) {
             double probability = random.nextDouble();
             int selectedIndex = 0;
             for (int j = 0; j < q.size() - 1; j++) {
@@ -149,8 +153,8 @@ public class VehicleRouting {
     }
 
     private void showBestPath() {
-        for (int i = 0; i < Parameters.bestPath.size(); i++) {
-            System.out.print(Parameters.bestPath.get(i) + " ");
+        for (int i = 0; i < Parameters.getBestPath().size(); i++) {
+            System.out.print(Parameters.getBestPath());
         }
         System.out.println();
     }
