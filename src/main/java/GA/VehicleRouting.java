@@ -1,6 +1,7 @@
 package GA;
 
 import Data.CustomGraph;
+
 import java.util.*;
 
 
@@ -92,13 +93,13 @@ public class VehicleRouting {
             for (Candidate individual : population) {
                 result += individual.getPathLength();
             }
-            Parameters.avgPathLength = result/population.size();
+            Parameters.avgPathLength = result / population.size();
 
-            System.out.println("Generation " + i + " of " + Parameters.generations);
-            System.out.print(Parameters.bestPathLength + " ");
-            showBestPath();
-            System.out.println("Average path length: " + Parameters.avgPathLength);
-            System.out.println();
+//            System.out.println("Generation " + i + " of " + Parameters.generations);
+//            System.out.print(Parameters.bestPathLength + " ");
+//            showBestPath();
+//            System.out.println("Average path length: " + Parameters.avgPathLength);
+//            System.out.println();
         }
 
         // Finish

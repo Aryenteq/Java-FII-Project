@@ -6,11 +6,10 @@ import java.sql.SQLException;
 
 public class MySQLConnector {
     private static MySQLConnector instance;
-    private Connection connection;
-
     private final String url = "jdbc:mysql://mysql-java-project-java-project-ary.j.aivencloud.com:19051/defaultdb?useSSL=true";
     private final String username = "avnadmin";
     private final String password = "AVNS_tOOa9Jvf_pEokRY30zo";
+    private final Connection connection;
 
     private MySQLConnector() throws SQLException {
         try {

@@ -18,9 +18,15 @@ module org.example.demo {
     requires java.net.http;
     requires org.json;
 
-    opens org.example.demo to javafx.fxml;
-    exports org.example.demo;
 
+    exports Main;
+    opens Main to javafx.fxml;
+    exports Controllers;
+    opens Controllers to javafx.fxml;
+    exports Data;
+    opens Data to javafx.fxml;
+    exports utils;
+    opens utils to javafx.fxml;
 
 
 }
