@@ -2,7 +2,6 @@ package SA;
 
 import Data.CustomGraph;
 import GA.Candidate;
-import GA.Parameters;
 
 import java.util.List;
 import java.util.Random;
@@ -24,8 +23,7 @@ public class SimulatedAnnealing {
                         // Mutate (get a neighbour)
                         it.changeChromosome(i, 1);
                         it.calculateFitness();
-                        if (it.getFitness() < bestPath)
-                            bestPath = it.getFitness();
+                        if (it.getFitness() < bestPath) bestPath = it.getFitness();
                         index = i;
 
                         // Reset
@@ -37,12 +35,10 @@ public class SimulatedAnnealing {
                     bestNeighbour.calculateFitness();
 
                     // We've found a better neighbour
-                    if (bestNeighbour.getFitness() < it.getFitness())
-                        it = bestNeighbour;
+                    if (bestNeighbour.getFitness() < it.getFitness()) it = bestNeighbour;
                     else if ((new Random().nextInt(1000) % 1000) / 1000.0 < Math.exp(-Math.abs(it.getFitness() - bestNeighbour.getFitness()) / temperature))
                         it = bestNeighbour;
-                    else
-                        contor++;
+                    else contor++;
                 } while (contor < 3 && !contor2);
                 System.out.println(temperature);
                 temperature *= 0.95;

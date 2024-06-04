@@ -1,22 +1,22 @@
 package GA;
 
+import Data.CustomGraph;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import Data.CustomGraph;
-import org.jetbrains.annotations.NotNull;
 
 /* The graph object is always passed because graph4j
     doesn't accept static objects - which is pretty fair
     */
 
 public class Candidate implements Comparable<Candidate> {
-    private double pathLength;
-    private List<Integer> chromosome;
-    private double fitness;
     private final CustomGraph graph;
+    private double pathLength;
+    private final List<Integer> chromosome;
+    private double fitness;
 
     // Used in the crossover for example
     public Candidate(List<Integer> order, CustomGraph graph) {
@@ -36,69 +36,6 @@ public class Candidate implements Comparable<Candidate> {
         Collections.shuffle(nodes);
         chromosome.addAll(nodes);
         calculateFitness();
-    }
-
-    public void calculateFitness() {
-        double result = 0;
-
-        // Add the depot
-        List<Integer> normalizedChromosome = getNormalizedChromosome();
-
-        // Get the distances based on the type of data structure used (custom graph || graph4j)
-        if (!Parameters.useGraph4j) {
-            for (int i = 0; i < normalizedChromosome.size() - 1; i++) {
-                result += graph.getDistances().get(normalizedChromosome.get(i)).get(normalizedChromosome.get(i + 1));
-            }
-        } else {
-            for (int i = 0; i < normalizedChromosome.size() - 1; i++) {
-                result += graph.getGraph().getEdgeWeight(normalizedChromosome.get(i), normalizedChromosome.get(i + 1));
-            }
-        }
-
-        this.pathLength = result;
-
-        if (result < Parameters.bestPathLength) {
-            Parameters.bestPathLength = result;
-            Parameters.bestPath = new ArrayList<>(normalizedChromosome);
-        }
-
-        this.fitness = 1 / result;
-    }
-
-    @NotNull
-    private List<Integer> getNormalizedChromosome() {
-        List<Integer> normalizedChromosome = new ArrayList<>(chromosome);
-        int insertions = 0;
-        for (int i = 0; i <= chromosome.size(); i += Parameters.nodesPerVehicle) {
-            if(insertions == 0) {
-                normalizedChromosome.add(i + insertions, 0);
-                i++;
-            } else {
-                normalizedChromosome.add(i + insertions - 1, 0);
-            }
-            insertions++;
-        }
-        if(normalizedChromosome.getLast() != 0) {
-            normalizedChromosome.add(0);
-        }
-        return normalizedChromosome;
-    }
-
-    // Swap two alleles
-    public void mutate(double prob) {
-        Random rand = new Random();
-        for (int i = 0; i < chromosome.size(); i++) {
-            if (rand.nextDouble() <= prob) {
-                int j = rand.nextInt(chromosome.size());
-                Collections.swap(chromosome, i, j);
-            }
-        }
-        calculateFitness();
-    }
-
-    @Override
-    public int compareTo(Candidate other) {
-        return Double.compare(this.fitness, other.fitness);
     }
 
     // Partially Mapped Crossover (PMX)
@@ -130,6 +67,70 @@ public class Candidate implements Comparable<Candidate> {
         }
 
         return new Candidate(childChromosome, graph);
+    }
+
+    public void calculateFitness() {
+        double result = 0;
+
+        // Add the depot
+        List<Integer> normalizedChromosome = getNormalizedChromosome();
+
+        // Get the distances based on the type of data structure used (custom graph || graph4j)
+        if (!Parameters.useGraph4j) {
+            for (int i = 0; i < normalizedChromosome.size() - 1; i++) {
+                result += graph.getDistances().get(normalizedChromosome.get(i)).get(normalizedChromosome.get(i + 1));
+            }
+        } else {
+            for (int i = 0; i < normalizedChromosome.size() - 1; i++) {
+                result += graph.getGraph().getEdgeWeight(normalizedChromosome.get(i), normalizedChromosome.get(i + 1));
+            }
+        }
+
+        this.pathLength = result;
+
+        if (result < Parameters.bestPathLength) {
+            Parameters.bestPathLength = result;
+            Parameters.bestPath = new ArrayList<>(normalizedChromosome);
+            Parameters.bestPathChanged = true;
+        }
+
+        this.fitness = 1 / result;
+    }
+
+    @NotNull
+    private List<Integer> getNormalizedChromosome() {
+        List<Integer> normalizedChromosome = new ArrayList<>(chromosome);
+        int insertions = 0;
+        for (int i = 0; i <= chromosome.size(); i += Parameters.nodesPerVehicle) {
+            if (insertions == 0) {
+                normalizedChromosome.add(i + insertions, 0);
+                i++;
+            } else {
+                normalizedChromosome.add(i + insertions - 1, 0);
+            }
+            insertions++;
+        }
+        if (normalizedChromosome.getLast() != 0) {
+            normalizedChromosome.add(0);
+        }
+        return normalizedChromosome;
+    }
+
+    // Swap two alleles
+    public void mutate(double prob) {
+        Random rand = new Random();
+        for (int i = 0; i < chromosome.size(); i++) {
+            if (rand.nextDouble() <= prob) {
+                int j = rand.nextInt(chromosome.size());
+                Collections.swap(chromosome, i, j);
+            }
+        }
+        calculateFitness();
+    }
+
+    @Override
+    public int compareTo(Candidate other) {
+        return Double.compare(this.fitness, other.fitness);
     }
 
     // Used only in SA
@@ -167,8 +168,7 @@ public class Candidate implements Comparable<Candidate> {
 
         if (!Parameters.useGraph4j) {
             // Custom graph
-            return graph.getDistances().get(a).get(c) + graph.getDistances().get(b).get(d) -
-                    (graph.getDistances().get(a).get(b) + graph.getDistances().get(c).get(d));
+            return graph.getDistances().get(a).get(c) + graph.getDistances().get(b).get(d) - (graph.getDistances().get(a).get(b) + graph.getDistances().get(c).get(d));
         } else {
             // Graph4j - a lot of iterators...
             double distanceAC = 0;

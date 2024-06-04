@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Map with Routes</title>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<div id="map" style="width: 100%; height: 100vh;"></div>
+<script>
+    var mapLib = L;
+    var map = mapLib.map('map').setView([37.7749, -122.4194], 6);
+
+    mapLib.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        minZoom: 4
+    }).addTo(map);
+
+    function addMarkerToMap(lat, long, name, id) {
+        let latlng = L.latLng(lat, long);
+        let marker = [L.marker(latlng).addTo(map), id];
+        marker[0].bindPopup(name);
+
+        marker[0].on('mouseover', function (e) {
+            this.openPopup();
+        });
+
+        marker[0].on('mouseout', function (e) {
+            this.closePopup();
+        });
+
+        marker[0].on('click', function (e) {
+            window.javaApp.addMarkerToList(marker[1]);
+            map.removeLayer(marker[0]);
+        });
+    }
+    function loadRoutes(routes) {
+        routes.forEach(route => {
+            addRoute(route.geometry);
+        });
+    }
+    function addRoute(geometry) {
+        var route = L.geoJSON(JSON.parse(geometry)).addTo(map);
+        map.fitBounds(route.getBounds());
+    }
+</script>
+</body>
+</html>

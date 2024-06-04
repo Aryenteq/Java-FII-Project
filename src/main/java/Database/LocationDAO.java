@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LocationDAO {
-    private Connection connection;
+    private final Connection connection;
 
     public LocationDAO() throws SQLException {
         this.connection = MySQLConnector.getInstance().getConnection();
@@ -78,8 +78,7 @@ public class LocationDAO {
             preparedStatement.setBoolean(1, true);
             preparedStatement.setInt(2, id);
             preparedStatement.executeUpdate();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
