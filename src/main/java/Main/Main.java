@@ -1,5 +1,6 @@
 package Main;
 
+import GA.VehicleRouting;
 import Stages.StageResources;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,6 +14,8 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch();
+//        VehicleRouting solver = new VehicleRouting();
+//        solver.run();
     }
 
     @Override

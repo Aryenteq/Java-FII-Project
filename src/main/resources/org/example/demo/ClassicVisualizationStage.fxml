@@ -32,7 +32,7 @@
             <Line endX="160.0" styleClass="hLine" />
             <VBox prefWidth="100.0" spacing="5.0">
                <children>
-                  <Label prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="Current best" textAlignment="CENTER" />
+                  <Label prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="Current average" textAlignment="CENTER" />
                   <Label prefWidth="160.0" stylesheets="@style/ClassicStage.css" text="0000" textAlignment="CENTER" />
                </children>
             </VBox>

@@ -9,7 +9,7 @@ public class GAThread implements Runnable {
     }
 
     @Override
-    public void run() {
+    public synchronized void run() {
         VehicleRouting solver = new VehicleRouting();
         solver.run();
     }
