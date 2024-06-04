@@ -147,8 +147,8 @@ public class ParametersController {
 
             Parameters.setMaxStagnationUntil2Opt(Integer.parseInt(opt2Gen.getText()));
             Parameters.setMaxStagnationUntilWisdom(Integer.parseInt(wisdomGen.getText()));
-            Parameters.setMaxStagnationUntilAdaptiveMutation(Integer.parseInt(elitismRate.getText()));
-            Parameters.setMaxStagnationUntilHyperMutation(Integer.parseInt(hyperMutationRate.getText()));
+            Parameters.setMaxStagnationUntilAdaptiveMutation(Integer.parseInt(mutationGen.getText()));
+            Parameters.setMaxStagnationUntilHyperMutation(Integer.parseInt(hyperMutationGen.getText()));
     }
 
 }
