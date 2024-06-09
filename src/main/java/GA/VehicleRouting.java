@@ -100,6 +100,7 @@ public class VehicleRouting {
             Parameters.setAvgPathLength(result/ population.size());
 //            System.out.println("Generation " + i + " of " + Parameters.getGenerations());
 //            System.out.print(Parameters.getBestPathLength() + " ");
+//            System.out.println();
 //            showBestPath();
 //            System.out.println("Average path length: " + Parameters.getAvgPathLength());
 //            System.out.println();

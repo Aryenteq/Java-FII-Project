@@ -13,6 +13,10 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch();
+
+        // Comment the line above and uncomment these two lines to run without GUI
+//        VehicleRouting solver = new VehicleRouting();
+//        solver.run();
     }
 
     @Override
